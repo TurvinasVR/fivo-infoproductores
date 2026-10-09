@@ -19,7 +19,7 @@ export function Proof() {
   const [main, ...rest] = proof.testimonials;
   return (
     <section aria-labelledby="prueba">
-      <div className="mx-auto max-w-[1120px] px-5 py-12 lg:px-10 lg:py-24">
+      <div className="mx-auto max-w-[1120px] px-5 py-12 lg:px-10 lg:py-20">
         <h2 id="prueba" className="font-display text-3xl font-black tracking-[-0.015em] sm:text-4xl">
           {proof.title}
         </h2>

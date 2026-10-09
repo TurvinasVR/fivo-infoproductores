@@ -69,6 +69,7 @@ export function HowItWorks() {
 
   /* ---------- escritorio: escenario fijo, el scroll es la línea de tiempo */
   const track = useRef<HTMLDivElement>(null);
+  const stick = useRef<HTMLDivElement>(null);
   const items = useRef<(HTMLElement | null)[]>([]);
   const bar = useRef<HTMLSpanElement>(null);
   const lastActive = useRef(-1);
@@ -76,9 +77,13 @@ export function HowItWorks() {
   const getTSticky = useCallback(() => {
     const el = track.current;
     if (!el) return 0;
+    const st = stick.current;
+    if (!st) return 0;
     const r = el.getBoundingClientRect();
-    const total = r.height - window.innerHeight;
-    return clamp01(-r.top / Math.max(1, total)) * 3;
+    // La escena se queda fija cuando el recorrido llega a su `top` y se suelta cuando su borde inferior toca el del recorrido
+    const top = parseFloat(getComputedStyle(st).top) || 0;
+    const total = r.height - st.offsetHeight;
+    return clamp01((top - r.top) / Math.max(1, total)) * 3;
   }, []);
 
   const onFrame = useCallback((s: HowState) => {
@@ -123,9 +128,14 @@ export function HowItWorks() {
     <section ref={section} aria-labelledby="como-funciona" className="relative overflow-x-clip border-t border-line">
       {/* Escritorio con movimiento: escenario fijo, el scroll es la línea de tiempo. CSS elige esta disposición o la apilada, así el HTML no cambia al cargar el JS */}
       <div className="hidden lg:block motion-reduce:lg:hidden">
-        <div ref={track} style={{ height: "230dvh" }}>
-          <div className="sticky top-0 flex h-[100dvh] items-center">
-            <div className="mx-auto grid w-full max-w-[1280px] grid-cols-12 items-center gap-10 px-10">
+        {/* El recorrido mide justo lo que dura la animación: la escena (alto --h) más 130dvh de scroll. Al acabar el paso 3
+            la escena termina en el borde inferior del recorrido y el bloque del botón aparece enseguida, sin pantalla vacía. */}
+        <div ref={track} data-how-track style={{ "--h": "max(min(72dvh, 640px), 36rem)", height: "calc(var(--h) + 130dvh)" } as React.CSSProperties}>
+          <div
+            ref={stick}
+            className="sticky mx-auto grid w-full max-w-[1280px] grid-cols-12 items-center gap-10 px-10"
+            style={{ top: "max(72px, calc((100dvh - var(--h)) / 2))", height: "var(--h)" }}
+          >
               <div className="col-span-4">
                 <h2 id="como-funciona" className="font-display text-4xl font-black tracking-[-0.015em]">
                   Cómo funciona
@@ -147,7 +157,7 @@ export function HowItWorks() {
                   ))}
                 </ol>
               </div>
-              <div className="relative col-span-8 h-[min(72dvh,640px)]">
+              <div className="relative col-span-8 h-[var(--h)]">
                 {stage("sticky", 0, false)}
                 {early && sticky && (
                   // Invisible hasta su primer fotograma: antes de eso sus piezas aún no tienen sitio y taparían al póster
@@ -166,15 +176,14 @@ export function HowItWorks() {
                   </div>
                 )}
               </div>
-            </div>
           </div>
         </div>
-        <BlockCta position="como-funciona" className="mx-auto max-w-[1280px] px-10 pb-20 pt-4" />
+        <BlockCta position="como-funciona" className="mx-auto max-w-[1280px] px-10 pb-20 pt-10" />
       </div>
 
       {/* Móvil, tableta y movimiento reducido: cada paso con su escena */}
       <div className="block lg:hidden motion-reduce:lg:block">
-        <div className="mx-auto max-w-[1120px] px-5 py-12 lg:px-10 lg:py-24">
+        <div className="mx-auto max-w-[1120px] px-5 py-12 lg:px-10 lg:py-20">
           <h2 className="font-display text-3xl font-black tracking-[-0.015em] sm:text-4xl">Cómo funciona</h2>
           <div className="mt-8 space-y-10">
             {STEPS.map((s, k) => (
