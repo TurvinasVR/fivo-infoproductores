@@ -178,12 +178,12 @@ export function HowItWorks() {
               </div>
           </div>
         </div>
-        <BlockCta position="como-funciona" className="mx-auto max-w-[1280px] px-10 pb-20 pt-10" />
+        <BlockCta position="como-funciona" className="mx-auto max-w-[1280px] px-10 pb-8 pt-12" />
       </div>
 
       {/* Móvil, tableta y movimiento reducido: cada paso con su escena */}
       <div className="block lg:hidden motion-reduce:lg:block">
-        <div className="mx-auto max-w-[1120px] px-5 py-12 lg:px-10 lg:py-20">
+        <div className="mx-auto max-w-[1120px] px-5 pb-5 pt-12 lg:px-10 lg:pb-8 lg:pt-20">
           <h2 className="font-display text-3xl font-black tracking-[-0.015em] sm:text-4xl">Cómo funciona</h2>
           <div className="mt-8 space-y-10">
             {STEPS.map((s, k) => (
@@ -216,7 +216,7 @@ export function HowItWorks() {
               </article>
             ))}
           </div>
-          <BlockCta position="como-funciona" className="mt-10" />
+          <BlockCta position="como-funciona" />
         </div>
       </div>
     </section>

@@ -19,7 +19,7 @@ export function Proof() {
   const [main, ...rest] = proof.testimonials;
   return (
     <section aria-labelledby="prueba">
-      <div className="mx-auto max-w-[1120px] px-5 py-12 lg:px-10 lg:py-20">
+      <div className="mx-auto max-w-[1120px] px-5 pb-5 pt-12 lg:px-10 lg:pb-8 lg:pt-20">
         <h2 id="prueba" className="font-display text-3xl font-black tracking-[-0.015em] sm:text-4xl">
           {proof.title}
         </h2>
@@ -59,7 +59,7 @@ export function Proof() {
             </div>
           </div>
         )}
-        <BlockCta position="prueba" className="mt-12" />
+        <BlockCta position="prueba" />
       </div>
     </section>
   );

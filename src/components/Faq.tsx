@@ -16,7 +16,7 @@ export function Faq() {
 
   return (
     <section aria-labelledby="faq" className="bg-bg">
-      <div className="mx-auto max-w-[1120px] px-5 py-12 lg:px-10 lg:py-20">
+      <div className="mx-auto max-w-[1120px] px-5 pb-5 pt-12 lg:px-10 lg:pb-8 lg:pt-20">
         <div className="max-w-[820px]">
         <h2 id="faq" className="font-display text-3xl font-black tracking-[-0.015em] sm:text-4xl">
           {faq.title}

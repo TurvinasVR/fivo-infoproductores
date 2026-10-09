@@ -91,7 +91,7 @@ export function ToolsScene() {
         {tools.intro && <p className="mx-auto mt-3 max-w-[640px] text-[16px] leading-snug text-fg-muted">{tools.intro}</p>}
       </div>
 
-      <div className="mx-auto max-w-[1120px] px-2 pb-10 sm:px-5 lg:px-10 lg:pb-14">
+      <div className="mx-auto max-w-[1120px] px-2 pb-5 sm:px-5 lg:px-10 lg:pb-8">
         <div
           ref={box}
           className="relative mx-auto h-[470px] w-full sm:h-[440px] lg:h-[500px]"
@@ -202,7 +202,7 @@ export function ToolsScene() {
             <p className="mt-3 text-[14px] leading-snug text-fg-muted">{tools.after.small}</p>
           </div>
         )}
-        <BlockCta position="herramientas" className="mt-8 flex justify-center" />
+        <BlockCta position="herramientas" />
       </div>
     </section>
   );
