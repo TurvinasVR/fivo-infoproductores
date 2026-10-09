@@ -3,7 +3,7 @@
 import { Proof } from "../Proof";
 import { BookingSection } from "../booking/BookingSection";
 import { Faq } from "../Faq";
-import { Closing } from "../Closing";
+import { Footer } from "../Footer";
 import { StickyCta } from "../StickyCta";
 import { HowItWorks } from "../HowItWorks";
 import { ToolsScene } from "../scene/ToolsScene";
@@ -31,7 +31,7 @@ export default function BelowFold() {
         <Faq />
       </main>
       <div className="relative z-[2]">
-        <Closing content={content} />
+        <Footer content={content} />
       </div>
       <StickyCta hideNearBlockCtas={content.repeatCta} />
       {content.repeatCta && <CtaGradientKeeper />}

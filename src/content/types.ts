@@ -179,7 +179,7 @@ export type LandingContent = {
 
   faq: { title: string; items: FaqItem[] };
 
-  closing: { title: string; disclaimer?: string };
+  footer: { disclaimer?: string };
 
   thanks: {
     title: string;

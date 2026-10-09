@@ -332,8 +332,7 @@ export const infoproductores: LandingContent = {
     ],
   },
 
-  closing: {
-    title: "Deja de ser la única persona que sabe cómo va todo.",
+  footer: {
     disclaimer: "Los resultados dependen de cada negocio y no están garantizados.",
   },
 
