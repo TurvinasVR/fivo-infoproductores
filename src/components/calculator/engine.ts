@@ -557,13 +557,23 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
         tipo:"calculo", reserva_id:host.reservaId() || "", sesion:host.sessionId(), landing:host.landing, evento:evento, email:em,
         sector: sec ? sec.querySelector("span").textContent : "",
         comerciales:r.reps, resto_equipo:r.rest, gasto_anual:r.team, ingresos_anuales:r.calls,
+        graba_llamadas: state.recCalls ? optText("recCalls", state.recCalls) : "",
+        revision_externa: state.hasConsult ? optText("hasConsult", state.hasConsult) : "",
+        optimizar_areas: state.optimize ? optText("optimize", state.optimize) : "",
+        gasto_apps_mes:r.appsM,
+        gasto_grabacion_mes: state.appsUnknown ? "no lo sé" : r.appsRepIn,
         herramientas: group(r.appsM) + " al mes en aplicaciones; " + (state.appsUnknown ? "no sabe cuánto en grabación (estimado " + group(r.subM) + " al mes)" : group(r.appsRepIn) + " al mes en grabación y transcripción"),
         supuestos:movedAssumptions(r),
-        ahorro:r.save, ganancia:r.earn, neto_anual:r.net, coste_mes:monthlyCost(r),
+        ahorro:r.save, ganancia:r.earn, neto_anual:r.net, coste_mes:monthlyCost(r), coste_anual:r.cost,
         facturacion: state.plan==="annual" ? "anual" : "mensual",
         website:""
       };
-      fetch(host.sheetUrl, {method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body), keepalive:true}).catch(function(){});
+      var json = JSON.stringify(body);
+      // El envío no depende del consentimiento de cookies (son los datos que la persona mete para preparar su llamada).
+      // Si el fetch falla (red, bloqueador), se prueba una vez con sendBeacon; si tampoco, se ignora: no frena nada.
+      fetch(host.sheetUrl, {method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:json}).catch(function(){
+        try{ navigator.sendBeacon(host.sheetUrl, new Blob([json], {type:"text/plain;charset=utf-8"})); }catch(e){}
+      });
     }catch(e){}
   }
   // Un cambio en el resultado se manda 2 s después del último movimiento
