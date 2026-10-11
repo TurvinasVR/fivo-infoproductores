@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BellRinging, CalendarPlus, CheckCircle } from "@phosphor-icons/react";
+import { CalendarPlus, CheckCircle } from "@phosphor-icons/react";
 import { siteConfig } from "@/config/site";
 import type { LandingContent } from "@/content/types";
 import { BOOKING_KEY } from "./booking/BookingBlock";
@@ -51,7 +51,6 @@ function downloadIcs(b: Booking, prodid: string) {
 export function ThanksContent({ content }: { content: LandingContent }) {
   const { slug, thanks, proof } = content;
   const rt = siteConfig.landings[slug];
-  const PREP = thanks.prep;
   const [booking, setBooking] = useState<Booking | null>(null);
 
   useEffect(() => {
@@ -70,41 +69,36 @@ export function ThanksContent({ content }: { content: LandingContent }) {
   const showTestimonials = rt.ready.testimonials && proof.testimonials.length >= 3;
 
   return (
-    <main className="relative z-[2] mx-auto max-w-[1120px] px-5 pb-20 pt-6 lg:px-10">
-      <div className="mx-auto max-w-[760px] text-center">
-        <CheckCircle size={52} weight="fill" className="mx-auto text-success" aria-hidden />
-        <h1 className="mt-5 font-display text-[clamp(1.9rem,1.3rem+2.4vw,3rem)] font-black leading-[1.1] tracking-[-0.015em]">
-          {thanks.title}
-        </h1>
-        <p className="mt-4 text-lg text-fg-muted">
+    <main className="relative z-[2] mx-auto max-w-[1120px] px-5 pb-20 pt-2 lg:px-10">
+      {/* Confirmación compacta: la calculadora tiene que verse en la primera pantalla */}
+      <div className="mx-auto max-w-[960px] text-center">
+        <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-3">
+          <CheckCircle size={32} weight="fill" className="shrink-0 text-success" aria-hidden />
+          <h1 className="font-display text-[1.75rem] font-black leading-[1.1] tracking-[-0.015em] lg:text-[2.5rem]">{thanks.title}</h1>
+        </div>
+        <p className="mt-3 text-[15px] text-fg-muted sm:text-base">
           {when ? (
             <>
               Te esperamos el <strong className="font-semibold text-fg">{when}</strong>. Dura <strong className="font-semibold text-fg">{booking?.minutes} minutos</strong>.
             </>
           ) : (
             <>Te esperamos en la hora que has elegido. Dura <strong className="font-semibold text-fg">{siteConfig.calendar.minutes} minutos</strong>.</>
-          )}
+          )}{" "}
+          Te llegará un recordatorio por email.
         </p>
         {booking?.mock && (
-          <p className="mt-3 text-sm text-warn">Reserva de ejemplo: el calendario de la página anterior era simulado.</p>
+          <p className="mt-2 text-sm text-warn">Reserva de ejemplo: el calendario de la página anterior era simulado.</p>
         )}
 
-        <div className="mt-7 flex flex-col items-center gap-3">
-          <button
-            type="button"
-            className="btn-cta"
-            disabled={!booking?.startsAt}
-            onClick={() => booking && downloadIcs(booking, thanks.ics.prodid)}
-          >
-            <CalendarPlus size={20} aria-hidden />
-            Añadir al calendario
-          </button>
-          {!booking?.startsAt && (
-            <p className="max-w-[420px] text-sm text-fg-muted">
-              Añade la cita desde la confirmación que te ha llegado del calendario.
-            </p>
-          )}
-        </div>
+        <button
+          type="button"
+          className="btn-ghost mt-4 disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={!booking?.startsAt}
+          onClick={() => booking && downloadIcs(booking, thanks.ics.prodid)}
+        >
+          <CalendarPlus size={18} aria-hidden />
+          Añadir al calendario
+        </button>
       </div>
 
       {showVideo && (
@@ -118,26 +112,6 @@ export function ThanksContent({ content }: { content: LandingContent }) {
         </div>
       )}
 
-
-      <section aria-labelledby="preparar" className="mx-auto mt-12 max-w-[760px]">
-        <h2 id="preparar" className="font-display text-2xl font-bold leading-snug sm:text-[1.75rem]">
-          {thanks.prepTitle}
-        </h2>
-        <p className="mt-2 text-fg-muted">{thanks.prepIntro}</p>
-        <ul className="mt-5 grid gap-3 sm:grid-cols-3">
-          {PREP.map((text, i) => (
-            <li key={text} className="card p-5">
-              <span className="text-[13px] font-semibold text-fg-muted">{i + 1}</span>
-              <p className="mt-1.5 text-[16px] leading-snug text-fg">{text}</p>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-5 flex items-start gap-3 text-[15px] text-fg-muted">
-          <BellRinging size={22} className="mt-0.5 shrink-0 text-accent" aria-hidden />
-          Recibirás un recordatorio de la llamada por email.
-        </p>
-      </section>
-
       {showTestimonials && (
         <div className="mt-14 grid gap-4 md:grid-cols-2 md:gap-5">
           <TestimonialCard data={proof.testimonials[1]} />
@@ -145,14 +119,17 @@ export function ThanksContent({ content }: { content: LandingContent }) {
         </div>
       )}
 
-      <section aria-labelledby="calculadora" className="mt-16 lg:mt-28">
-        <h2
-          id="calculadora"
-          className="mx-auto max-w-[760px] text-center font-display text-[clamp(1.6rem,1.1rem+1.8vw,2.5rem)] font-black leading-[1.1] tracking-[-0.015em]"
-        >
-          {thanks.calculator.title}
-        </h2>
-        <div className="mt-8 lg:mt-10">
+      <section aria-labelledby="calculadora" className="mt-8 lg:mt-12">
+        <div className="mx-auto max-w-[760px] text-center">
+          <h2
+            id="calculadora"
+            className="font-display text-[clamp(1.375rem,1rem+1.6vw,2rem)] font-black leading-[1.15] tracking-[-0.015em]"
+          >
+            {thanks.calculator.title}
+          </h2>
+          <p className="mt-2 text-[15px] text-fg-muted sm:text-base">{thanks.calculator.intro}</p>
+        </div>
+        <div className="mt-5 lg:mt-6">
           <Calculator />
         </div>
       </section>

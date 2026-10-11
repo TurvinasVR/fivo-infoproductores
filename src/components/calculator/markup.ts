@@ -31,11 +31,12 @@ export const CALCULATOR_HTML = `<div id="page">
 <div aria-labelledby="memTitle" class="fields" role="group">
 <div class="fld">
 <label data-i18n="w024" for="reps">Comerciales</label>
-<div class="input stepper"><button aria-label="Quitar un comercial" class="sq" data-for="reps" data-step="-1" type="button">−</button><input aria-describedby="step1Msg" autocomplete="off" data-i18n-ph="s093" data-k="reps" id="reps" inputmode="numeric" placeholder="Número de personas" value="3"/><button aria-label="Añadir un comercial" class="sq" data-for="reps" data-step="1" type="button">+</button></div>
+<div class="input stepper"><button aria-label="Quitar un closer o setter" class="sq" data-for="reps" data-step="-1" type="button">−</button><input aria-describedby="step1Msg" autocomplete="off" data-i18n-ph="s093" data-k="reps" id="reps" inputmode="numeric" placeholder="Número de personas" value="3"/><button aria-label="Añadir un closer o setter" class="sq" data-for="reps" data-step="1" type="button">+</button></div>
 </div>
 <div class="fld">
 <label data-i18n="w025" for="rest">Resto del equipo</label>
 <div class="input stepper"><button aria-label="Quitar una persona del resto del equipo" class="sq" data-for="rest" data-step="-1" type="button">−</button><input aria-describedby="step1Msg" autocomplete="off" data-i18n-ph="s093" data-k="rest" id="rest" inputmode="numeric" placeholder="Número de personas" value="7"/><button aria-label="Añadir una persona al resto del equipo" class="sq" data-for="rest" data-step="1" type="button">+</button></div>
+<p class="hint">Soporte, contenido, operaciones.</p>
 </div>
 </div>
 <p class="q-sub">Tus números</p>
@@ -55,7 +56,7 @@ export const CALCULATOR_HTML = `<div id="page">
 <div class="nav-row">
 <p aria-live="polite" class="hint warn" id="step1Msg"></p>
 <span></span>
-<button class="btn btn-white" id="next1" type="button"><span data-i18n="s023">Continuar</span> <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+<button class="btn-cta" id="next1" type="button"><span data-i18n="s023">Continuar</span> <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
 </div>
 </section>
 <section aria-labelledby="h2s" class="wiz" hidden="" id="step2">
@@ -88,7 +89,7 @@ export const CALCULATOR_HTML = `<div id="page">
 </div>
 <div class="nav-row">
 <button class="btn btn-line" data-i18n="s036" id="back2" type="button">Atrás</button>
-<button class="btn btn-white" id="next2" type="button"><span data-i18n="s023">Continuar</span> <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+<button class="btn-cta" id="next2" type="button"><span data-i18n="s023">Continuar</span> <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
 </div>
 </section>
 <section aria-labelledby="h3s" class="wiz" hidden="" id="step3">
@@ -102,7 +103,7 @@ export const CALCULATOR_HTML = `<div id="page">
 </div>
 <div class="nav-row">
 <button class="btn btn-line" data-i18n="s036" id="back3" type="button">Atrás</button>
-<button class="btn btn-white" id="next3" type="button"><span data-i18n="s037">Ver mi resultado</span> <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+<button class="btn-cta" id="next3" type="button"><span data-i18n="s037">Ver mi resultado</span> <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
 </div>
 </section>
 <aside aria-label="Resultado estimado" class="live" id="live">
@@ -129,7 +130,6 @@ export const CALCULATOR_HTML = `<div id="page">
 <div class="res" id="netCard">
 <div class="res-head">
 <h3 class="rs-title" data-i18n="r001">Esto es lo que Fivo podría darte cada año</h3>
-<a class="cbtn-ghost" href="#" id="ctaMini"></a>
 </div>
 <p class="net" id="net"><span aria-hidden="true" class="rv-ok"></span><span class="net-k" id="rcTail"></span><b class="net-n" id="rcEq"></b></p>
 <p class="rs-negnote" hidden="" id="rcNeg"></p>
@@ -141,26 +141,16 @@ export const CALCULATOR_HTML = `<div id="page">
 <p class="sr-only"><span id="rcExpr"></span></p>
 <p class="rs-price" id="priceMsg"></p>
 <div class="cta" id="ctaBox">
-<h4 id="ctaTitle"></h4>
-<p class="rs-small" id="ctaSmall"></p>
-<a class="btn-cta btn-main" href="#" id="ctaBtn"><span id="ctaBtnText"></span><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<h4 id="ctaTitle">Trae este cálculo a tu llamada y lo revisamos juntos.</h4>
+<button class="btn-cta btn-main" id="ctaCopy" type="button"><span id="ctaCopyText">Copiar enlace con mi cálculo</span></button>
 <p class="rs-est"><span data-i18n="r030">Estimación a partir de tus datos</span> · <button class="rs-link" data-i18n="r031" id="openCalc" type="button">Ver cómo se calcula</button></p>
 </div>
-</div>
-<section aria-labelledby="t-opn" class="opn" hidden="" id="testimonials">
-<h3 id="t-opn">Opiniones sobre Fivo</h3>
-<div aria-label="Opiniones sobre Fivo" aria-roledescription="carrusel" class="opn-track" id="opnTrack" role="region" tabindex="0"></div>
-<div class="opn-ctrl" id="opnCtrl">
-<button aria-label="Opinión anterior" class="opn-nav" id="opnPrev" type="button"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
-<div class="opn-dots" id="opnDots"></div>
-<button aria-label="Opinión siguiente" class="opn-nav" id="opnNext" type="button"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
-</div>
-</section>
-<div aria-labelledby="lbTitle" class="logo-band" hidden="" id="logoBand" role="region">
+</div><div aria-labelledby="lbTitle" class="logo-band" hidden="" id="logoBand" role="region">
 <p class="lb-title" data-i18n="w001" id="lbTitle">Empresas que ya usan Fivo</p>
 <div class="lb-view"><div class="lb-track" id="lbTrack"></div></div>
 </div>
 </div>
+<p class="rs-after">Antes de la llamada, piensa qué quieres resolver primero.</p>
 <section aria-labelledby="t-ex" class="ex" hidden="" id="examples">
 <div class="ex-in">
 <h3 data-i18n="x001" id="t-ex">Así sale el cálculo en empresas como la tuya</h3>
@@ -171,10 +161,6 @@ export const CALCULATOR_HTML = `<div id="page">
 </section>
 <p class="sr-only" id="srStatus" role="status" aria-live="polite"></p>
 </main>
-</div>
-<div class="sticky-net" hidden="" id="stickyBar">
-<span class="sticky-label" id="stickyLabel"></span>
-<a class="btn-cta sticky-btn" href="#" id="stickyBtn"></a>
 </div>
 <div class="modal" hidden="" id="calcModal">
 <div class="modal-backdrop" id="mdBackdrop"></div>

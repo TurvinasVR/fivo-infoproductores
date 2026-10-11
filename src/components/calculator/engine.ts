@@ -37,8 +37,6 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
       calcNeg:"Con estos datos el resultado neto es {n}. Ajusta los supuestos o cuéntanos tu caso.",
       stickyProfit:"Beneficio neto estimado: {x}/año", netRow:"Beneficio neto estimado",
       priceMsg:"Fivo cuesta menos de {max} al mes por persona.",
-      ctaTitleA:"¿Quieres hacer una llamada para que lo implementemos en tu empresa?", ctaBtnA:"Agendar mi llamada", ctaSmallA:"Revisamos tus números contigo y te decimos por dónde empezar.",
-      ctaTitleB:"Empieza a usar Fivo hoy mismo", ctaBtnB:"Prueba 7 días gratis", ctaSmallB:"También tienes el plan Free.", ctaDuration:" · {n} min", callPrefill:"Calculadora Fivo: beneficio neto estimado {net}/año ({save} de ahorro + {gain} de ganancia − {cost} de Fivo). Equipo: {members} personas.", stickyNoProfit:"¿Quieres una llamada para implementarlo?", stickyBtnA:"Agendar llamada", stickyBtnB:"Probar gratis",
       toolsLabel:"Grabación, transcripción y notas de reuniones",
       toolsOwn:"{m} al mes × 12 meses, tal como lo indicas",
       toolsEst:"Estimación: el {pc} de tus {a} al mes en aplicaciones ({m} al mes) × 12 meses",
@@ -49,8 +47,8 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
       auditRefNote:"Lo que costaría contratarlo: el {pc} de tu gasto anual ({team}), entre {min} y {max}. Fivo lo hace de forma continua con tus reuniones",
       timeLabel:"Tiempo recuperado del equipo",
       timeNote:"{p} de {loss} que hoy se pierden buscando información (≈ 20 % del gasto de {n} {pl}: {team})",
-      extraLabel:"Ventas extra por llamadas",
-      extraNote:"{p} sobre {x} de ingresos por llamadas",
+      extraLabel:"Ventas extra en tus llamadas de venta",
+      extraNote:"{p} sobre {x} de ingresos anuales de tu infoproducto",
       tagOwn:"Tu dato", tagRef:"Referencia", tagEst:"Estimación",
       gA:"A. Herramientas que dejas de pagar", gB:"B. Análisis externo que te ahorras", gC:"C. Tiempo que recupera tu equipo (estimación)", gD:"D. Ventas extra (estimación)",
       subtotal:"Subtotal {l}",
@@ -92,14 +90,14 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
     mdOpener = opener || document.activeElement;
     $("calcModal").hidden = false;
     document.documentElement.classList.add("md-open");
-    $("page").inert = true; $("stickyBar").inert = true;
+    $("page").inert = true;
     $("mdBox").focus();
   }
   function closeCalc(){
     if($("calcModal").hidden) return;
     $("calcModal").hidden = true;
     document.documentElement.classList.remove("md-open");
-    $("page").inert = false; $("stickyBar").inert = false;
+    $("page").inert = false;
     if(mdOpener && document.contains(mdOpener) && mdOpener.focus) mdOpener.focus();
     mdOpener = null;
   }
@@ -149,7 +147,7 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
     clearTimeout(annTimer);
     annTimer = setTimeout(function(){
       var el = $("srStatus");
-      if(state.step===LAST) el.textContent = $("stickyLabel").textContent;
+      if(state.step===LAST){ var rr = compute(state); el.textContent = rr.ready ? tr("stickyProfit",{x:eur(rr.net)}) : ""; }
       else el.textContent = LIVE_STATUS[state.step];
     }, 800);
   }
@@ -182,43 +180,7 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
   function trackParams(){ return {sector: state.sector || "sin_sector", team_size: sizeBucket(members())}; }
   var started = false;
   function markStart(){ if(started) return; started = true; host.track("calculator_start"); }
-  function withUtm(url, content){
-    var h = "", i = url.indexOf("#"); if(i>=0){ h = url.slice(i); url = url.slice(0,i); }
-    return url + (url.indexOf("?")>=0 ? "&" : "?") + "utm_source=calculadora&utm_medium=web&utm_campaign=roi-calculator&utm_content=" + content + h;
-  }
-  function renderCta(r){
-    var v = variant(), call = v==="A", key = v==="A" ? "A" : v==="B" ? "B" : "conversion";
-    $("ctaTitle").textContent = tr(call ? "ctaTitleA" : "ctaTitleB");
-    var dur = (call && typeof CFG.callDuration==="number" && CFG.callDuration>0) ? tr("ctaDuration",{n:group(CFG.callDuration)}) : "";
-    $("ctaBtnText").textContent = tr(call ? "ctaBtnA" : "ctaBtnB") + dur;
-    $("ctaSmall").textContent = tr(call ? "ctaSmallA" : "ctaSmallB");
-    var reg = CFG.registerUrl.replace("{lang}", LANG);
-    var cal = call ? callLink(r) : null;
-    var main = call ? cal.url : reg;
-    $("ctaBtn").setAttribute("href", withUtm(main, "cta-main-" + key));
-    setTab($("ctaBtn"), call && cal.tab);
-    $("ctaMini").textContent = tr(call ? "stickyBtnA" : "stickyBtnB");
-    $("ctaMini").setAttribute("href", withUtm(main, "cta-top-" + key));
-    setTab($("ctaMini"), call && cal.tab);
-    if(r.net>0) tweenText("stickyLabel", r.net, function(v){ return tr("stickyProfit",{x:eur(v)}); }, "pos"); else setNow("stickyLabel", tr("stickyNoProfit"));
-    $("stickyBtn").textContent = tr(call ? "stickyBtnA" : "stickyBtnB");
-    $("stickyBtn").setAttribute("href", withUtm(main, "cta-sticky-" + key));
-    setTab($("stickyBtn"), call && cal.tab);
-  }
-  function callLink(r){
-    var base = String(CFG.callUrl || "");
-    if(base.indexOf("https://")!==0) return {url: base + "#" + encode(), tab:false};
-    var url = base.split("#")[0];
-    if(CFG.callPrefill && r.net>0){
-      var txt = tr("callPrefill",{net:eur(r.net), save:eur(r.save), gain:eur(r.earn), cost:eur(r.cost), members:group(members())});
-      url += (url.indexOf("?")>=0 ? "&" : "?") + "a1=" + encodeURIComponent(txt);
-    }
-    return {url:url, tab:true};
-  }
-  function setTab(a, on){
-    if(on){ a.setAttribute("target","_blank"); a.setAttribute("rel","noopener"); a.setAttribute("aria-label", a.textContent.trim() + tr("newTab")); }
-    else { a.removeAttribute("target"); a.removeAttribute("rel"); a.removeAttribute("aria-label"); }
-  }
+  var copyTimer = null; // El resultado no lleva botón de agenda (quien llega aquí ya ha reservado): la acción es copiar el enlace
   function videoEmbed(u){
     try{
       var x = new URL(u, location.href), h = x.hostname.replace(/^www\./,""), m;
@@ -278,22 +240,12 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
     $("logoBand").hidden = !(res && bandOK);
     root.classList.toggle("is-result", res);
     $("live").hidden = res;
-    updateSticky();
-  }
-  var inView = false;
-  function updateSticky(){ $("stickyBar").hidden = state.step!==LAST || !inView; measureBar(); }
-  function measureBar(){ root.style.setProperty("--bar-h", $("stickyBar").hidden ? "0px" : Math.ceil($("stickyBar").getBoundingClientRect().height)+"px"); }
-  if("ResizeObserver" in window){ var ro = new ResizeObserver(measureBar); ro.observe($("stickyBar")); off.push(function(){ ro.disconnect(); }); }
-  if("IntersectionObserver" in window){
-    var io = new IntersectionObserver(function(es){ inView = es[es.length-1].isIntersecting; updateSticky(); }, {threshold:0});
-    io.observe($("page")); off.push(function(){ io.disconnect(); });
   }
   function goto(n){
     var first = n===LAST && !calcDone && compute(state).ready;
     if(first) calcDone = true;
     state.step = n; root.classList.add("anim"); renderSteps(); render();
     if(first){ revealResult(); host.track("calculator_complete", trackParams()); } else if(n!==LAST) announce();
-    if(n===LAST) updateSticky();
     var f = $("calc"); if(f && f.scrollIntoView) f.scrollIntoView({behavior: reduced?"auto":"smooth", block:"start"});
   }
 
@@ -354,13 +306,13 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
     $("billNote").innerHTML = (state.plan==="annual" || r.netIfAnnual<=0)
       ? tr("noteA",{s:eur(r.costMonthly - r.costAnnual)})
       : tr("noteM",{s:eur(r.costMonthly - r.costAnnual), n:eur(r.netIfAnnual)});
-    renderVideo(); renderCta(r); announce();
+    renderVideo(); announce();
     renderTable(r);
     return r;
   }
 
   var calcDone = false;
-  var LIVE_STATUS = ["", "Analizando tu sector…", "Estimando tus ventas…", "Valorando tus herramientas…"];
+  var LIVE_STATUS = ["", "Analizando tu sector…", "Estimando tus llamadas…", "Valorando tus herramientas…"];
 
   function monthlyCost(r){ return Math.round(r.people * (state.plan==="annual" ? CFG.priceAnnual : CFG.priceMonthly) * 100) / 100; }
 
@@ -578,12 +530,22 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
 
   function msg(t, bad){ var m=$("msg"); m.textContent=t; m.style.color = bad ? "var(--warn)" : "var(--good)"; }
   function shareLink(){ return location.origin + location.pathname + location.search + "#" + encode(); }
-  $("copyBtn").addEventListener("click", function(){
+  function copyLink(btnText){
     var url = shareLink();
+    function done(){
+      msg(tr("copied"));
+      var t = $("ctaCopyText"); if(!t) return;
+      t.textContent = "Enlace copiado";
+      clearTimeout(copyTimer); copyTimer = setTimeout(function(){ t.textContent = STATIC.es.s059; }, 2600);
+      timers.push(copyTimer);
+      $("srStatus").textContent = tr("copied");
+    }
     if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(function(){ msg(tr("copied")); }, function(){ window.prompt(tr("copyPrompt"), url); });
+      navigator.clipboard.writeText(url).then(done, function(){ window.prompt(tr("copyPrompt"), url); });
     } else window.prompt(tr("copyPrompt"), url);
-  });
+  }
+  on($("copyBtn"), "click", copyLink);
+  on($("ctaCopy"), "click", copyLink);
   $("openCalc").addEventListener("click", function(){ openCalc(this); });
   $("mdClose").addEventListener("click", closeCalc);
   $("mdBackdrop").addEventListener("click", closeCalc);
@@ -655,131 +617,6 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
   var bandBuilt = false;
   function ensureBand(){ if(bandBuilt) return; bandBuilt = true; buildLogoBand(); }
 
-  var opn = {list:[], timer:null, stopped:false, hover:false, focus:false, inView:false, viewed:false, drag:null, built:false};
-  function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text!==undefined) e.textContent = text; return e; }
-  function opnItems(){
-    var out = [];
-    (CFG.testimonials || []).forEach(function(c){
-      if(!c || !c.name || !c.text || c.consent!==true || c.sample===true) return;
-      out.push(c);
-    });
-    return out;
-  }
-  function opnInitials(n){ var p = String(n).trim().split(/\s+/); return (p[0].charAt(0) + (p.length>1 ? p[p.length-1].charAt(0) : "")).toUpperCase(); }
-  function opnStep(){ var tr0 = $("opnTrack"), c = tr0.children[1] || tr0.children[0]; if(!c) return 0; return tr0.children[1] ? tr0.children[1].offsetLeft - tr0.children[0].offsetLeft : c.getBoundingClientRect().width; }
-  function opnIdx(){
-    var tk = $("opnTrack"), st = opnStep(), n = opn.list.length; if(!st) return 0;
-    if(tk.scrollLeft >= tk.scrollWidth - tk.clientWidth - 2) return n-1;
-    return Math.max(0, Math.min(n-1, Math.round(tk.scrollLeft / st)));
-  }
-  function opnPaint(){
-    var tk = $("opnTrack"), i = opnIdx(), dots = $("opnDots").children;
-    for(var k=0; k<dots.length; k++) dots[k].setAttribute("aria-current", String(k===i));
-    $("opnPrev").disabled = tk.scrollLeft <= 2;
-    $("opnNext").disabled = tk.scrollLeft >= tk.scrollWidth - tk.clientWidth - 2;
-  }
-  function opnStop(){ opn.stopped = true; if(opn.timer){ clearInterval(opn.timer); opn.timer = null; } }
-  function opnGo(i, user){
-    var n = opn.list.length; if(n<2) return;
-    if(user){ opnStop(); }
-    $("opnTrack").scrollTo({left: Math.max(0, Math.min(n-1, i)) * opnStep(), behavior: reduced ? "auto" : "smooth"});
-  }
-  function opnMeasure(){
-    var sec = $("testimonials"); if(!sec.getClientRects().length) return;
-    Array.prototype.forEach.call($("opnTrack").children, function(card){
-      if(card.classList.contains("open")) return;
-      var q = card.querySelector(".opn-q"), b = card.querySelector(".opn-more"), over = q.scrollHeight > q.clientHeight + 1;
-      q.classList.toggle("clip", over); b.hidden = !over;
-    });
-    opnPaint();
-  }
-  function buildTestimonials(){
-    var sec = $("testimonials"), tk = $("opnTrack"), dots = $("opnDots"), items = opnItems(); opn.list = items;
-    sec.hidden = !items.length; tk.textContent = ""; dots.textContent = "";
-    if(!items.length){ opnStop(); return; }
-    items.forEach(function(c, i){
-      var card = el("figure", "opn-card"); card.style.setProperty("--i", String(Math.min(i, 5)));
-      card.setAttribute("role", "group"); card.setAttribute("aria-roledescription", "diapositiva"); card.setAttribute("aria-label", (i+1) + " de " + items.length);
-      var stars = el("div", "opn-stars"); stars.setAttribute("role", "img"); stars.setAttribute("aria-label", c.stars + (c.stars===1 ? " estrella" : " estrellas"));
-      for(var k=0; k<c.stars; k++) stars.insertAdjacentHTML("beforeend", '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2.8l2.8 6 6.5.8-4.8 4.5 1.3 6.5L12 17.4 6.2 20.6l1.3-6.5L2.7 9.6l6.5-.8z"/></svg>');
-      card.appendChild(stars);
-      var q = el("blockquote", "opn-q", c.text); q.id = "opn-q" + i; card.appendChild(q);
-      var more = el("button", "opn-more", "Leer más"); more.type = "button"; more.hidden = true; more.setAttribute("aria-expanded", "false"); more.setAttribute("aria-controls", q.id);
-      more.addEventListener("click", function(){
-        var open = card.classList.toggle("open");
-        q.style.maxHeight = open ? q.scrollHeight + "px" : ""; more.textContent = open ? "Leer menos" : "Leer más"; more.setAttribute("aria-expanded", String(open));
-        if(!open) setTimeout(opnMeasure, 300);
-      });
-      card.appendChild(more);
-      if(c.translated) card.appendChild(el("span", "opn-tr", "Traducido del inglés"));
-      var by = el("figcaption", "opn-by"), who = el("span", "opn-who");
-      by.appendChild(el("span", "opn-av", opnInitials(c.name))); by.lastChild.setAttribute("aria-hidden", "true");
-      who.appendChild(el("b", "", c.name)); who.appendChild(el("span", "", [c.place, c.sector].filter(Boolean).join(" · ")));
-      by.appendChild(who); card.appendChild(by);
-      tk.appendChild(card);
-      var dt = el("button", "opn-dot"); dt.type = "button"; dt.setAttribute("aria-label", "Ir a la opinión " + (i+1));
-      dt.addEventListener("click", function(){ opnGo(i, true); });
-      dots.appendChild(dt);
-    });
-    $("opnCtrl").hidden = items.length<2;
-    if(!opn.built){ opn.built = true; opnWire(); }
-    if("IntersectionObserver" in window && !reduced && !sec.classList.contains("in")) sec.classList.add("pre");
-    opnPaint();
-  }
-  function opnWire(){
-    var sec = $("testimonials"), tk = $("opnTrack"), raf = 0;
-    $("opnPrev").addEventListener("click", function(){ opnGo(opnIdx() - 1, true); });
-    $("opnNext").addEventListener("click", function(){ opnGo(opnIdx() + 1, true); });
-    tk.addEventListener("scroll", function(){ if(raf) return; raf = requestAnimationFrame(function(){ raf = 0; opnPaint(); }); });
-    tk.addEventListener("keydown", function(e){
-      var i = opnIdx(), n = opn.list.length;
-      if(e.key==="ArrowRight"){ e.preventDefault(); opnGo(i+1, true); }
-      else if(e.key==="ArrowLeft"){ e.preventDefault(); opnGo(i-1, true); }
-      else if(e.key==="Home"){ e.preventDefault(); opnGo(0, true); }
-      else if(e.key==="End"){ e.preventDefault(); opnGo(n-1, true); }
-    });
-    sec.addEventListener("pointerenter", function(){ opn.hover = true; });
-    sec.addEventListener("pointerleave", function(){ opn.hover = false; });
-    sec.addEventListener("focusin", function(){ opn.focus = true; });
-    sec.addEventListener("focusout", function(){ opn.focus = false; });
-    tk.addEventListener("touchstart", opnStop, {passive:true});
-    tk.addEventListener("pointerdown", function(e){
-      if(e.pointerType!=="mouse" || e.button>0 || e.target.closest("button")) return;
-      opn.drag = {x:e.clientX, left:tk.scrollLeft, moved:false};
-    });
-    on(window, "pointermove", function(e){
-      if(!opn.drag) return;
-      var dx = e.clientX - opn.drag.x;
-      if(!opn.drag.moved && Math.abs(dx)>6){ opn.drag.moved = true; opnStop(); tk.style.scrollSnapType = "none"; tk.style.cursor = "grabbing"; }
-      if(opn.drag.moved) tk.scrollLeft = opn.drag.left - dx;
-    });
-    on(window, "pointerup", function(){
-      if(!opn.drag) return;
-      var moved = opn.drag.moved; opn.drag = null;
-      if(!moved) return;
-      tk.style.scrollSnapType = ""; tk.style.cursor = "";
-      opnGo(Math.round(tk.scrollLeft / opnStep()), false);
-    });
-    on(window, "resize", opnMeasure);
-    if(document.fonts && document.fonts.ready) document.fonts.ready.then(opnMeasure);
-    if("IntersectionObserver" in window){
-      new IntersectionObserver(function(es){
-        es.forEach(function(en){
-          opn.inView = en.isIntersecting;
-          if(!en.isIntersecting) return;
-          opnMeasure();
-          if(sec.classList.contains("pre")){ sec.classList.remove("pre"); sec.classList.add("in"); }
-          if(!opn.viewed){ opn.viewed = true; }
-        });
-      }, {threshold:0.2}).observe(sec);
-    } else opn.inView = true;
-    if(!reduced) timers.push(opn.timer = setInterval(function(){
-      if(opn.stopped || opn.hover || opn.focus || !opn.inView || document.hidden || opn.list.length<2) return;
-      var tk2 = $("opnTrack"), atEnd = tk2.scrollLeft >= tk2.scrollWidth - tk2.clientWidth - 2;
-      opnGo(atEnd ? 0 : opnIdx() + 1, false);
-    }, 6500));
-  }
-
   function exInputs(e){
     var tier = (typeof e.consultores==="number") ? e.consultores : -1;
     return {reps:e.comerciales, rest:e.resto, team:e.gastoAnual, calls:e.ingresos, apps:e.gastoApps, appsRep:e.gastoGrabacion, appsUnknown:false,
@@ -830,7 +667,7 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
   LANG = "es"; state.lang = "es";
   applyStatic();
   syncControls();
-  buildTestimonials(); buildExamples();
+  buildExamples();
   if(fromLink && state.step===LAST && compute(state).ready){ calcDone = true; $("netCard").classList.add("ok"); renderSteps(); render(); }
   else { if(state.step===LAST || (state.step>1 && !canNext1(compute(state)))) state.step = 1; renderSteps(); render(); announce(); }
 
