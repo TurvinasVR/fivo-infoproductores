@@ -34,14 +34,4 @@ export const CFG = {
   ],
   callDuration: null,
   defaultLang: "es",
-  customerLogos: [
-    {name:"Catalana Occidente",    scale:1.5, url:"https://pub-3e391b23958e4e1b93d08a1ebeb9c70d.r2.dev/brain_resources/companies/Catalana_Occidente_Logo.png"},
-    {name:"Embat",                 scale:1.9, url:"https://pub-3e391b23958e4e1b93d08a1ebeb9c70d.r2.dev/brain_resources/companies/Embat.png"},
-    {name:"Eurofins Scientific",   scale:0.95, url:"https://pub-3e391b23958e4e1b93d08a1ebeb9c70d.r2.dev/brain_resources/companies/Eurofins_Scientific_logo.png"},
-    {name:"Gameloft",              scale:0.9, url:"https://pub-3e391b23958e4e1b93d08a1ebeb9c70d.r2.dev/brain_resources/companies/Gameloft-logo-and-wordmark.png"},
-    {name:"Construccions Rubau",   scale:0.9, url:"https://pub-3e391b23958e4e1b93d08a1ebeb9c70d.r2.dev/brain_resources/companies/Logo-CONSTRUCCIONS-RUBAU-ES1.png"},
-    {name:"Mapei",                 scale:0.9, url:"https://pub-3e391b23958e4e1b93d08a1ebeb9c70d.r2.dev/brain_resources/companies/Mapei_logo.png"},
-    {name:"Thinking Heads",        scale:1.7, url:"https://pub-3e391b23958e4e1b93d08a1ebeb9c70d.r2.dev/brain_resources/companies/TH1_logos_LOGO_completo_claim-negro-1.png"},
-    {name:"Universidad de Navarra",scale:1.6, url:"https://pub-3e391b23958e4e1b93d08a1ebeb9c70d.r2.dev/brain_resources/companies/Logotipo_Universidad_de_Navarra_negro_sobre_blanco-SVG.png"}
-  ]
 };

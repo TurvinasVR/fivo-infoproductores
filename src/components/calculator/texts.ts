@@ -79,7 +79,6 @@ export const STATIC_ES: Record<string, string> = {
   "r002": "Te ahorrarías",
   "r003": "Ganarías más",
   "r004": "al año",
-  "w001": "Empresas que ya usan Fivo",
   "e001": "Estimación basada en tus datos, en McKinsey Global Institute (2012) y en los precios públicos de Fivo. Los resultados reales dependen de cada negocio.",
   "t001": "TESTIMONIOS",
   "t002": "Lo que dicen nuestros usuarios",

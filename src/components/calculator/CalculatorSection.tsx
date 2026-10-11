@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
+import { CLIENTS, ClientLogos } from "../ClientLogos";
 import { Calculator } from "./Calculator";
 
 // Las opiniones solo se piden al llegar al resultado y en su propio fragmento: no retrasan nada de lo anterior
@@ -17,6 +18,16 @@ const sub = "mt-2 text-[15px] text-fg-muted sm:text-base";
 export function CalculatorSection({ title, intro, resultTitle, disclaimer }: { title: string; intro: string; resultTitle: string; disclaimer: string }) {
   const section = useRef<HTMLElement>(null);
   const [step, setStep] = useState(1);
+
+  // Al empezar a rellenar los datos se piden ya los logotipos: al llegar al resultado salen sin esperar
+  useEffect(() => {
+    if (step < 2) return;
+    CLIENTS.forEach((c) => {
+      const img = new Image();
+      img.fetchPriority = "low";
+      img.src = `/logos/clients/${c.file}`;
+    });
+  }, [step >= 2]);
 
   useEffect(() => {
     const el = section.current;
@@ -45,7 +56,17 @@ export function CalculatorSection({ title, intro, resultTitle, disclaimer }: { t
       <div className="mt-5 lg:mt-6">
         <Calculator disclaimer={disclaimer} />
       </div>
-      {result && <Reviews />}
+      {result && (
+        <>
+          {/* Logotipos y reseñas, en este orden y solo en el resultado: 48 px entre bloques en escritorio y 32 en móvil */}
+          {/* (la calculadora ya deja 24 px debajo de su última línea) */}
+          <div className="mt-2 lg:mt-6">
+            <p className="mb-2 text-center text-[12px] font-medium text-fg-muted">Clientes de Fivo</p>
+            <ClientLogos />
+          </div>
+          <Reviews className="mt-8 lg:mt-12" />
+        </>
+      )}
     </section>
   );
 }

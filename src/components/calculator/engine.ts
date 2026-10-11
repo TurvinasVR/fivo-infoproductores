@@ -108,7 +108,7 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
   var EN = function(){ return LANG==="en"; };
   function group(n){ return String(Math.abs(Math.round(n))).replace(/\B(?=(\d{3})+(?!\d))/g, EN()?",":"."); }
   function eur(n){ var neg = n<0 ? "−" : ""; return EN() ? neg+"€"+group(n) : neg+group(n)+" €"; }
-  function eur2(n){ var s = (Math.round(n*100)/100).toFixed(2); return EN() ? "€"+s : s.replace(".",",")+" €"; }
+  function eur2(n){ var s = (Math.round(n*100)/100).toFixed(2), p = s.split("."), neg = p[0].charAt(0)==="-" ? "-" : "", i = p[0].replace("-","").replace(/\B(?=(\d{3})+(?!\d))/g, EN()?",":"."); return EN() ? neg+"€"+i+"."+p[1] : neg+i+","+p[1]+" €"; }
   function numDec(x){ return EN() ? x : x.replace(".",","); }
   function d1(n){ return numDec(n.toFixed(1)); }
   function dec(n){ return numDec((Math.round(n*10)/10).toString()); }
@@ -127,7 +127,6 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
                 audOn:true, revOn:true, step:1, lang:"" };
 
   var LAST = 4;
-  var bandOK = false;
 
   function renderSeg(){ root.querySelectorAll(".cseg button").forEach(function(b){ b.setAttribute("aria-pressed", String(b.dataset.plan===state.plan)); }); }
   var counting = false, countTok = 0;
@@ -198,8 +197,6 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
     }
     var res = state.step===LAST;
     $("steps").hidden = res;
-    if(res) ensureBand();
-    $("logoBand").hidden = !(res && bandOK);
     root.classList.toggle("is-result", res);
     root.dispatchEvent(new CustomEvent("calc:step", {detail:{step:state.step}, bubbles:true}));
     $("live").hidden = res;
@@ -586,30 +583,6 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
 
   if(!CFG.leadEndpoint){ $("leadForm").hidden = true; $("legalNote").hidden = true; }
 
-
-  function buildLogoBand(){
-    var track = $("lbTrack"), list = CFG.customerLogos || [];
-    if(!list.length) return;
-    list.forEach(function(c){ new Image().src = c.url; });
-    function half(hidden){
-      var d = document.createElement("div"); d.className = "lb-half"; if(hidden) d.setAttribute("aria-hidden","true");
-      for(var r=0; r<2; r++) list.forEach(function(c){
-        var im = document.createElement("img");
-        im.alt = hidden ? "" : c.name; im.src = c.url; im.setAttribute("data-u", c.url); im.decoding = "async";
-        im.style.setProperty("--s", String(c.scale || 1));
-        im.addEventListener("error", function(){
-          track.querySelectorAll("img").forEach(function(x){ if(x.getAttribute("data-u")===c.url) x.remove(); });
-          if(!track.querySelector("img")){ bandOK = false; $("logoBand").hidden = true; }
-        });
-        d.appendChild(im);
-      });
-      return d;
-    }
-    track.appendChild(half(false)); track.appendChild(half(true));
-    bandOK = true;
-  }
-  var bandBuilt = false;
-  function ensureBand(){ if(bandBuilt) return; bandBuilt = true; buildLogoBand(); }
 
   function exInputs(e){
     var tier = (typeof e.consultores==="number") ? e.consultores : -1;
