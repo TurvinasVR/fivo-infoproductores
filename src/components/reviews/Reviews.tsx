@@ -37,7 +37,7 @@ export default function Reviews({ headingLevel = 3, className = "mt-14 lg:mt-20"
   };
 
   const arrow =
-    "inline-flex size-11 items-center justify-center rounded-full border border-line text-fg transition-colors hover:border-line-strong hover:bg-surface-2 disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent";
+    "inline-flex size-11 items-center justify-center rounded-full border border-line text-fg transition-colors hover-ring-brand disabled:cursor-default disabled:opacity-40";
 
   return (
     <section aria-labelledby="opiniones" className={className}>
@@ -72,9 +72,9 @@ export default function Reviews({ headingLevel = 3, className = "mt-14 lg:mt-20"
             aria-label={`${i + 1} de ${REVIEWS.length}`}
             className="flex shrink-0 basis-[85%] snap-start flex-col gap-4 rounded-xl border border-line bg-surface p-6 sm:basis-[calc((100%-16px)/2)] lg:basis-[calc((100%-32px)/3)]"
           >
-            <div className="flex gap-0.5 text-accent" role="img" aria-label={`${r.stars} estrellas`}>
+            <div className="flex gap-0.5" role="img" aria-label={`${r.stars} estrellas`}>
               {Array.from({ length: r.stars }, (_, k) => (
-                <Star key={k} size={16} weight="fill" aria-hidden />
+                <Star key={k} size={16} weight="fill" className="icon-brand" aria-hidden />
               ))}
             </div>
             <blockquote className="text-[15px] leading-relaxed text-fg">{r.text}</blockquote>

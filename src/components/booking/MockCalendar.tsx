@@ -58,7 +58,7 @@ export function MockCalendar({ onBooked }: { onBooked: (startsAtIso: string) => 
       </div>
 
       <div className="mt-5 flex items-center gap-2 text-[14px] text-fg-muted">
-        <Globe size={18} className="text-accent" aria-hidden />
+        <Globe size={18} className="icon-brand" aria-hidden />
         Hora de España (Europe/Madrid)
       </div>
 

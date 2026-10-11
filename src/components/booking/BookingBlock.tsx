@@ -22,19 +22,24 @@ export { BOOKING_KEY };
 
 function Steps({ stage }: { stage: Stage }) {
   const second = stage === "calendar";
+  const disc = "flex h-7 w-7 items-center justify-center rounded-full text-[13px] font-bold transition-colors duration-300";
   return (
     <ol className="mt-6 flex max-w-[420px] items-center gap-3 text-[15px]" aria-label="Pasos">
       <li className="flex items-center gap-2.5 font-medium" aria-current={!second ? "step" : undefined}>
-        <span className={`flex h-7 w-7 items-center justify-center rounded-full border text-[13px] font-bold transition-colors duration-300 ${second ? "border-accent bg-accent text-bg" : "border-accent text-accent"}`}>
-          {second ? <Check size={14} weight="bold" aria-hidden /> : "1"}
-        </span>
+        {second ? (
+          <span className={`${disc} bg-brand text-fg`}>
+            <Check size={14} weight="bold" aria-hidden />
+          </span>
+        ) : (
+          <span className={`${disc} ring-brand text-fg`}>1</span>
+        )}
         <span className={second ? "text-fg-muted" : "text-fg"}>Tus datos</span>
       </li>
-      <span aria-hidden className="relative h-px flex-1 bg-line-strong">
-        <span className="absolute inset-y-0 left-0 bg-accent transition-[width] duration-500" style={{ width: second ? "100%" : "0%" }} />
+      <span aria-hidden className="relative h-0.5 flex-1 overflow-hidden rounded-full bg-line-strong">
+        <span className="bg-brand-x absolute inset-y-0 left-0 transition-[width] duration-500" style={{ width: second ? "100%" : "0%" }} />
       </span>
       <li className="flex items-center gap-2.5 font-medium" aria-current={second ? "step" : undefined}>
-        <span className={`flex h-7 w-7 items-center justify-center rounded-full border text-[13px] font-bold transition-colors duration-300 ${second ? "border-accent text-accent" : "border-line-strong text-fg-muted"}`}>2</span>
+        <span className={`${disc} ${second ? "ring-brand text-fg" : "border border-line-strong text-fg-muted"}`}>2</span>
         <span className={second ? "text-fg" : "text-fg-muted"}>Elige hora</span>
       </li>
     </ol>
@@ -132,7 +137,7 @@ export default function BookingBlock() {
 
             {stage === "free" && (
               <div className="pane-in">
-                <Heart size={32} weight="fill" className="text-accent" aria-hidden />
+                <Heart size={32} weight="fill" className="icon-brand" aria-hidden />
                 <p className="mt-4 font-display text-xl font-bold leading-snug sm:text-2xl">{rich(booking.free.headline)}</p>
                 <p className="mt-3 text-fg-muted">{booking.free.text}</p>
                 <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -155,10 +160,10 @@ export default function BookingBlock() {
           <div>
             <h3 className="font-display text-xl font-bold">Qué pasa después</h3>
             <ol className="relative mt-4 space-y-4">
-              <span aria-hidden className="absolute bottom-3 left-[13px] top-3 w-px bg-line-strong" />
+              <span aria-hidden className="bg-brand-y absolute bottom-3 left-[13px] top-3 w-px" />
               {booking.next.map((t, i) => (
                 <li key={i} className="relative flex items-start gap-3.5">
-                  <span className="relative z-[1] flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-full border border-accent bg-bg text-[13px] font-bold text-accent">{i + 1}</span>
+                  <span className="relative z-[1] flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-full ring-brand text-[13px] font-bold text-fg">{i + 1}</span>
                   <span className="pt-0.5 text-[16px] leading-snug text-fg-muted">{rich(t)}</span>
                 </li>
               ))}

@@ -57,7 +57,7 @@ export function Hero({ content }: { content: LandingContent }) {
         </div>
 
         <div className="mt-4 w-full sm:w-auto lg:mt-4">
-          <CtaBlock position="hero" size="xl" align="center" heroAnchor />
+          <CtaBlock position="hero" size="lg" align="center" heroAnchor />
         </div>
 
         <div className="mt-5 w-full lg:mt-4"><ScaleLine figures={content.proof.scale} /></div>

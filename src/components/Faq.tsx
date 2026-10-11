@@ -41,7 +41,7 @@ export function Faq() {
                     <Plus
                       size={22}
                       aria-hidden
-                      className="shrink-0 text-accent transition-transform duration-300"
+                      className="icon-brand shrink-0 transition-transform duration-300"
                       style={{ transform: isOpen ? "rotate(45deg)" : "none" }}
                     />
                   </button>

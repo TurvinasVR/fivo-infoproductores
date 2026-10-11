@@ -260,7 +260,7 @@ export function VideoPlayer({
       </div>
 
       <div className="absolute inset-x-0 bottom-0 z-20 h-[3px] bg-fg/15" aria-hidden>
-        <div className="h-full bg-accent" style={{ width: `${progress * 100}%` }} />
+        <div className="bg-brand-x h-full" style={{ width: `${progress * 100}%` }} />
       </div>
       {endCta && ended && (
         <div

@@ -5,7 +5,7 @@ export function TestimonialCard({ data, featured = false }: { data: TestimonialD
   return (
     <figure className={`card flex h-full flex-col p-6 ${featured ? "sm:p-8" : ""}`}>
       <div className="flex items-center gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-line bg-accent font-sans text-lg font-bold text-bg">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-line bg-brand font-sans text-lg font-bold text-bg">
           {data.logoOrPhoto ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={data.logoOrPhoto} alt="" className="h-full w-full object-cover" />

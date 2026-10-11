@@ -30,7 +30,7 @@ function StepHead({ n, title, desc }: { n: number; title: string; desc: string }
     <>
       <span
         aria-hidden
-        className="relative z-[1] flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line-strong bg-bg font-display text-sm font-bold text-accent"
+        className="relative z-[1] flex h-8 w-8 shrink-0 items-center justify-center rounded-full ring-brand font-display text-sm font-bold text-fg"
       >
         {n}
       </span>
@@ -142,7 +142,7 @@ export function HowItWorks() {
                 </h2>
                 <ol className="relative mt-9 space-y-8">
                   <span aria-hidden className="absolute bottom-3 left-4 top-3 w-px bg-line" />
-                  <span ref={bar} aria-hidden className="absolute bottom-3 left-4 top-3 w-px origin-top bg-accent" style={{ transform: "scaleY(0)" }} />
+                  <span ref={bar} aria-hidden className="absolute bottom-3 left-4 top-3 w-px origin-top bg-brand-y" style={{ transform: "scaleY(0)" }} />
                   {STEPS.map((s, i) => (
                     <li
                       key={s.title}

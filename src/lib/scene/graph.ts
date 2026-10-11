@@ -54,7 +54,7 @@ export function projectHero(n: GNode) {
   return { x: 800 + n.x * s * 58, y: 450 + n.y * s * 58, s };
 }
 
-export type ToolId = "zoom" | "meet" | "teams" | "hubspot" | "slack" | "notion" | "drive" | "claude" | "chatgpt" | "zapier";
+export type ToolId = "zoom" | "meet" | "outlook" | "gmail" | "drive" | "clickup" | "trello" | "jira" | "chatgpt" | "claude";
 
 export type ToolNode = {
   id: ToolId;
@@ -70,20 +70,20 @@ export type ToolNode = {
 };
 
 const DEFS: Record<ToolId, Omit<ToolNode, "id" | "u" | "v" | "z">> = {
-  hubspot: { name: "HubSpot", file: "hubspot.svg", gives: "CRM" },
-  claude: { name: "Claude", file: "claude.svg", gives: "Tu IA", mcp: true },
   zoom: { name: "Zoom", file: "zoom.svg", gives: "Llamadas" },
   meet: { name: "Google Meet", file: "googlemeet.svg", gives: "Llamadas" },
-  teams: { name: "Microsoft Teams", file: "teams.svg", gives: "Llamadas" },
-  slack: { name: "Slack", file: "slack.svg", gives: "Mensajes" },
-  notion: { name: "Notion", file: "notion.svg", gives: "Documentos" },
+  outlook: { name: "Microsoft Outlook", file: "outlook.svg", gives: "Correo y calendario" },
+  gmail: { name: "Gmail", file: "gmail.svg", gives: "Correo" },
   drive: { name: "Google Drive", file: "googledrive.svg", gives: "Documentos" },
+  clickup: { name: "ClickUp", file: "clickup.svg", gives: "Tareas" },
+  trello: { name: "Trello", file: "trello.svg", gives: "Tareas" },
+  jira: { name: "Jira", file: "jira.svg", gives: "Tareas" },
   chatgpt: { name: "ChatGPT", file: "openai.svg", gives: "Tu IA", mcp: true },
-  zapier: { name: "Zapier", file: "zapier.svg", gives: "Automatizaciones" },
+  claude: { name: "Claude", file: "claude.svg", gives: "Tu IA", mcp: true },
 };
 
 /** Herramientas del grafo decorativo por defecto, en su orden en el anillo. */
-export const TOOL_IDS_DEFAULT: ToolId[] = ["hubspot", "claude", "zoom", "meet", "teams", "slack", "notion", "drive", "chatgpt"];
+export const TOOL_IDS_DEFAULT: ToolId[] = ["zoom", "meet", "outlook", "gmail", "drive", "clickup", "trello", "jira", "chatgpt", "claude"];
 
 const toolCache = new Map<string, ToolNode[]>();
 

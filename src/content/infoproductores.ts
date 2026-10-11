@@ -32,12 +32,12 @@ export const infoproductores: LandingContent = {
   },
 
   tools: {
-    ids: ["hubspot", "claude", "zoom", "meet", "teams", "slack", "notion", "drive", "zapier", "chatgpt"],
+    ids: ["zoom", "meet", "outlook", "gmail", "drive", "clickup", "trello", "jira", "chatgpt", "claude"],
     title: "Se conecta a lo que ya usas, y a tu IA",
-    srList: "Zoom, Google Meet, Microsoft Teams, Slack, Notion, Google Drive, HubSpot y Zapier, y Claude y ChatGPT vía MCP.",
+    srList: "Zoom, Google Meet, Microsoft Outlook, Gmail, Google Drive, ClickUp, Trello y Jira, y ChatGPT y Claude vía MCP.",
     after: {
       main: "Seis herramientas separadas no son un sistema. Fivo las une sin que cambies ninguna.",
-      small: "¿Usas algo que no está aquí? Zapier y webhooks conectan el resto.",
+      small: "¿Usas algo que no está aquí? Los webhooks conectan el resto.",
     },
   },
 
@@ -59,8 +59,8 @@ export const infoproductores: LandingContent = {
         nodes: [
           { f: "zoom.svg", dx: -38, dy: -22 },
           { f: "googlemeet.svg", dx: 18, dy: -38 },
-          { f: "teams.svg", dx: -14, dy: 34 },
-          { f: "hubspot.svg", dx: 42, dy: 10 },
+          { f: "outlook.svg", dx: -14, dy: 34 },
+          { f: "gmail.svg", dx: 42, dy: 10 },
         ],
       },
       {
@@ -83,9 +83,9 @@ export const infoproductores: LandingContent = {
         ring: [170, 150],
         labelTop: 82,
         nodes: [
-          { f: "slack.svg", dx: -54, dy: -10 },
-          { f: "notion.svg", dx: 4, dy: 18 },
-          { f: "googledrive.svg", dx: 58, dy: -16 },
+          { f: "clickup.svg", dx: -54, dy: -10 },
+          { f: "trello.svg", dx: 4, dy: 18 },
+          { f: "jira.svg", dx: 58, dy: -16 },
         ],
       },
     ],
@@ -102,7 +102,7 @@ export const infoproductores: LandingContent = {
     steps: [
       {
         title: "Conectas tus herramientas. No cambias ninguna.",
-        desc: "Escena animada: los logotipos de Zoom, Google Meet, Microsoft Teams, HubSpot, Slack, Notion, Google Drive, Zapier, Claude y ChatGPT aparecen sueltos y se van conectando uno a uno con el nodo central de Fivo, hasta formar un grafo unido.",
+        desc: "Escena animada: los logotipos de Zoom, Google Meet, Microsoft Outlook, Gmail, Google Drive, ClickUp, Trello, Jira, ChatGPT y Claude aparecen sueltos y se van conectando uno a uno con el nodo central de Fivo, hasta formar un grafo unido.",
       },
       {
         title: "Cada llamada, cada tarea y cada conversación entra en el grafo: qué se dijo, quién lo hizo y en qué quedó.",
@@ -280,7 +280,7 @@ export const infoproductores: LandingContent = {
       FAQ_TRANSCRIBE,
       {
         q: "¿Tengo que cambiar de herramientas?",
-        a: "No. Fivo se conecta a las que ya usas: Zoom, Google Meet, Microsoft Teams, Slack, Notion, Google Drive, HubSpot y Zapier. Si usas otra, Zapier y webhooks conectan el resto.",
+        a: "No. Fivo se conecta a las que ya usas: Zoom, Google Meet, Microsoft Outlook, Gmail, Google Drive, ClickUp, Trello y Jira. Si usas otra, los webhooks conectan el resto.",
       },
       {
         q: "¿Dónde se guardan mis datos y los de mis alumnos?",

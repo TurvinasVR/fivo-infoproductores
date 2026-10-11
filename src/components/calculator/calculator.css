@@ -255,7 +255,7 @@ html.md-open {overflow:hidden}
 .calc .dd-btn {display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:0 16px;border:1px solid color-mix(in srgb, var(--color-fg) 14%, transparent);border-radius:var(--r-md);background:var(--color-surface);color:var(--ph);font-family:var(--font);font-size:16px;text-align:left;cursor:pointer;transition:border-color .15s,background-color .15s,box-shadow .15s}
 .calc .dd-btn:hover {border-color:color-mix(in srgb, var(--color-fg) 40%, transparent)}
 .calc .dd-btn:focus-visible {outline:3px solid var(--b2);outline-offset:2px}
-.calc .dd-btn.has {color:var(--color-fg);border-color:var(--brand);background:linear-gradient(135deg,color-mix(in srgb, var(--color-grad-a) 16%, transparent),color-mix(in srgb, var(--color-grad-b) 6%, transparent)),var(--color-surface)}
+.calc .dd-btn.has {color:var(--color-fg);border-color:transparent;background:linear-gradient(135deg,color-mix(in srgb, var(--color-grad-a) 16%, transparent),color-mix(in srgb, var(--color-grad-b) 6%, transparent)) padding-box,linear-gradient(var(--color-surface),var(--color-surface)) padding-box,var(--grad-135) border-box}
 .calc .dd-icon {display:flex;flex:none}
 .calc .dd-icon:empty {display:none}
 .calc .dd-icon svg, .calc .dd-ic {flex:none;width:20px;height:20px;fill:none;stroke:var(--label);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
