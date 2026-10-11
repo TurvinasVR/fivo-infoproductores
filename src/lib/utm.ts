@@ -1,4 +1,5 @@
 import { currentLanding } from "./analytics";
+import { getVisitorCode } from "./visitor";
 
 const KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid", "fbclid"] as const;
 const STORE = "fivo-utm";
@@ -26,18 +27,20 @@ export function captureUtm(): Utm {
 
 const PASS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"] as const;
 
-/** El enlace de reserva solo con ref=<landing> (lo que se puede pintar en el HTML del servidor). */
+/** El enlace de reserva solo con ref=<landing> (lo que se pinta en el HTML del servidor; al cargar se completa con el código). */
 export function refUrl(url: string): string {
   const u = new URL(url);
   u.searchParams.set("ref", currentLanding());
   return u.toString();
 }
 
-/** El enlace de reserva con ref=<landing> y los utm_ de la URL actual, si trae alguno. */
+/** El enlace de reserva con ref=<landing>.<código del visitante> y los utm_ de la URL actual, si trae alguno. */
 export function withUtm(url: string): string {
   if (typeof window === "undefined") return refUrl(url);
   const from = new URLSearchParams(window.location.search);
-  const u = new URL(refUrl(url));
+  const u = new URL(url);
+  const code = getVisitorCode();
+  u.searchParams.set("ref", code ? `${currentLanding()}.${code}` : currentLanding());
   for (const k of PASS) {
     const v = from.get(k);
     if (v) u.searchParams.set(k, v.slice(0, 200));

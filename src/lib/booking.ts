@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config/site";
+import { captureMeetzParams } from "./reserva";
 
 /** Clave de sessionStorage con la reserva que guarda el formulario antes de ir a /gracias. */
 export const BOOKING_KEY = "fivo-booking";
@@ -14,7 +15,7 @@ export type BookingInfo = {
 
 // Parámetros con los que Calendly (event_start_time) y Cal.com (startTime) redirigen al terminar la reserva.
 // Todavía no están conectados: la lectura está preparada para cuando lo estén. La duración es siempre la de la landing (30 minutos).
-const START_PARAMS = ["event_start_time", "startTime", "start_time"];
+const START_PARAMS = ["event_start_time", "startTime", "start_time", "start"];
 const MEETING_PARAMS = ["meeting_url", "meetingUrl", "videoCallUrl", "video_call_url", "join_url", "hangoutLink", "location"];
 
 function validDate(v: string | null | undefined): Date | null {
@@ -38,12 +39,14 @@ function httpUrl(v: string | null | undefined): string | undefined {
  * calendario, y si no, la reserva guardada en el navegador. Sin ninguna, null.
  */
 export function readBooking(): BookingInfo | null {
-  const q = new URLSearchParams(window.location.search);
+  // Parámetros de la URL y los guardados al llegar (meetz redirige una vez; la fecha sigue disponible en la visita)
+  const q = new Map(Object.entries(captureMeetzParams()));
+  new URLSearchParams(window.location.search).forEach((v, k) => q.set(k, v));
   const first = (keys: string[]) => keys.map((k) => q.get(k)).find((v) => v) ?? null;
 
   const fromUrl = validDate(first(START_PARAMS));
   if (fromUrl) {
-    const meetingUrl = MEETING_PARAMS.map((k) => httpUrl(q.get(k))).find(Boolean);
+    const meetingUrl = MEETING_PARAMS.map((k) => httpUrl(q.get(k) ?? null)).find(Boolean);
     return { startsAt: fromUrl, minutes: siteConfig.calendar.minutes, mock: false, meetingUrl };
   }
 
@@ -63,4 +66,4 @@ export function readBooking(): BookingInfo | null {
  * Script que corre antes de pintar la confirmación y marca <html data-booking> si hay fecha. Así el botón "Añadir al
  * calendario" ya está (o no está) en la primera pintura y la página no salta al hidratar.
  */
-export const BOOKING_SNIFF = `try{var q=new URLSearchParams(location.search),k=${JSON.stringify(START_PARAMS)},ok=false;for(var i=0;i<k.length;i++){var v=q.get(k[i]);if(v&&!isNaN(Date.parse(v)))ok=true}if(!ok){var r=sessionStorage.getItem(${JSON.stringify(BOOKING_KEY)});if(r){var b=JSON.parse(r);if(b&&b.startsAt&&!isNaN(Date.parse(b.startsAt)))ok=true}}if(ok)document.documentElement.setAttribute("data-booking","1");var rr=q.get("r");if(rr){try{sessionStorage.setItem("fivo-reserva",rr.slice(0,80))}catch(e){}}var sv=rr||sessionStorage.getItem("fivo-reserva");if(sv)document.documentElement.setAttribute("data-reserva","1")}catch(e){}`;
+export const BOOKING_SNIFF = `try{var q=new URLSearchParams(location.search),k=${JSON.stringify(START_PARAMS)},ok=false,P={};try{P=JSON.parse(sessionStorage.getItem("fivo-meetz-params")||"{}")}catch(e){}var any=false;q.forEach(function(v,n){P[n.slice(0,60)]=v.slice(0,200);any=true});if(any){try{sessionStorage.setItem("fivo-meetz-params",JSON.stringify(P))}catch(e){}}for(var i=0;i<k.length;i++){var v=P[k[i]];if(v&&!isNaN(Date.parse(v)))ok=true}if(!ok){var r=sessionStorage.getItem(${JSON.stringify(BOOKING_KEY)});if(r){var b=JSON.parse(r);if(b&&b.startsAt&&!isNaN(Date.parse(b.startsAt)))ok=true}}if(ok)document.documentElement.setAttribute("data-booking","1");var ids=${JSON.stringify(["r", "booking_id", "bookingId", "id"])},has=false;for(var j=0;j<ids.length;j++){if(P[ids[j]])has=true}if(has)document.documentElement.setAttribute("data-reserva","1")}catch(e){}`;

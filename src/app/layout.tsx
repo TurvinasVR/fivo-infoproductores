@@ -7,6 +7,7 @@ import { ACTIVE_LANDING } from "@/lib/activeLanding";
 import { AnalyticsLoader } from "@/components/AnalyticsLoader";
 import { CookieBanner } from "@/components/CookieBanner";
 import { BrandIcons } from "@/components/BrandIcons";
+import { VisitorCode } from "@/components/VisitorCode";
 
 // Manrope: toda la interfaz (sistema de diseño de Fivo). next/font la autoaloja en el build.
 const manrope = Manrope({
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <AnalyticsLoader />
         <BrandIcons />
+        <VisitorCode />
       </body>
     </html>
   );
