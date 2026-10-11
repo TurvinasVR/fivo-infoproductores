@@ -1,4 +1,5 @@
 import { HeroBackdrop } from "../scene/HeroBackdrop";
+import { Footer } from "../Footer";
 import { ThanksContent } from "../ThanksContent";
 import type { LandingContent } from "@/content/types";
 import { BOOKING_SNIFF } from "@/lib/booking";
@@ -17,6 +18,9 @@ export function ThanksPage({ content }: { content: LandingContent }) {
       {/* Marca <html data-booking> antes de pintar: el botón del calendario no salta al hidratar */}
       <script dangerouslySetInnerHTML={{ __html: BOOKING_SNIFF }} />
       <ThanksContent content={content} />
+      <div className="relative z-[2]">
+        <Footer content={content} plain />
+      </div>
     </div>
   );
 }

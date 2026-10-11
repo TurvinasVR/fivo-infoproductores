@@ -338,7 +338,6 @@ export const infoproductores: LandingContent = {
 
   thanks: {
     title: "Tu llamada está agendada",
-    videoLabel: "Vídeo de 60 segundos antes de la llamada",
     ics: { prodid: "-//Fivo//Llamada infoproductores//ES" },
     calculator: {
       title: "Mientras llega la llamada, calcula cuánto te ahorraría Fivo",

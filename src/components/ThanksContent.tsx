@@ -6,7 +6,6 @@ import { siteConfig } from "@/config/site";
 import type { LandingContent } from "@/content/types";
 import { readBooking, type BookingInfo } from "@/lib/booking";
 import { CalendarAdd } from "./CalendarAdd";
-import { VideoPlayer } from "./VideoPlayer";
 import { TestimonialCard } from "./Testimonial";
 import { CalculatorSection } from "./calculator/CalculatorSection";
 
@@ -33,12 +32,10 @@ export function ThanksContent({ content }: { content: LandingContent }) {
   }, []);
 
   const when = booking ? whenFmt.format(booking.startsAt) : null;
-  const videoReady = rt.ready.thanksVideo && rt.thanksVideo.src;
-  const showVideo = Boolean(videoReady);
   const showTestimonials = rt.ready.testimonials && proof.testimonials.length >= 3;
 
   return (
-    <main className="relative z-[2] mx-auto max-w-[1120px] px-5 pb-20 pt-2 lg:px-10">
+    <main className="relative z-[2] mx-auto max-w-[1120px] px-5 pb-5 pt-2 lg:px-10 lg:pb-8">
       {/* Confirmación compacta: la calculadora tiene que verse en la primera pantalla */}
       <div className="mx-auto max-w-[960px] text-center">
         <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-3">
@@ -61,17 +58,6 @@ export function ThanksContent({ content }: { content: LandingContent }) {
 
         <CalendarAdd booking={booking} prodid={thanks.ics.prodid} />
       </div>
-
-      {showVideo && (
-        <div className="mx-auto mt-12 max-w-[760px]">
-          <VideoPlayer
-            src={rt.thanksVideo.src}
-            poster={rt.thanksVideo.poster || "/img/video-poster.webp"}
-            captions="/video/placeholder-es.vtt"
-            label={thanks.videoLabel}
-          />
-        </div>
-      )}
 
       {showTestimonials && (
         <div className="mt-14 grid gap-4 md:grid-cols-2 md:gap-5">

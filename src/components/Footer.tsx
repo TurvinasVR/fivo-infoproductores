@@ -3,10 +3,11 @@ import type { LandingContent } from "@/content/types";
 import { CookiePrefsButton } from "./CookiePrefsButton";
 
 /** Pie de página: aviso de resultados, copyright y enlaces legales. */
-export function Footer({ content }: { content: LandingContent }) {
+/** `plain`: sin el margen inferior que deja sitio al botón fijo de la landing (en /gracias no hay botón fijo). */
+export function Footer({ content, plain = false }: { content: LandingContent; plain?: boolean }) {
   const { footer } = content;
   return (
-    <footer className="mt-12 pb-24 md:pb-0 lg:mt-20">
+    <footer className={`mt-12 lg:mt-20 ${plain ? "" : "pb-24 md:pb-0"}`}>
       <div className="mx-auto max-w-[1120px] border-t border-line px-5 py-6 text-sm text-fg-muted lg:px-10">
         {footer.disclaimer && <p className="mb-4 text-[13px] leading-snug text-fg-muted">{footer.disclaimer}</p>}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

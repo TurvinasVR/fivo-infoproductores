@@ -121,12 +121,6 @@ export const CALCULATOR_HTML = `<div id="page">
 <section hidden="" id="step4">
 <div class="rs">
 <p class="rs-back"><button class="link-btn" data-i18n="s070" id="editData" type="button">← Cambiar mis datos</button></p>
-<section aria-labelledby="t-vid" class="vid-sec" hidden="" id="videoSec">
-<h3 data-i18n="r020" id="t-vid">Cómo funciona Fivo</h3>
-<div class="vid" id="videoBox">
-<button aria-label="Reproducir el vídeo" class="vid-play" id="videoPlay" type="button"><span aria-hidden="true" class="vid-btn"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span></button>
-</div>
-</section>
 <div class="res" id="netCard">
 <div class="res-head">
 <h3 class="rs-title" data-i18n="r001">Esto es lo que Fivo podría darte cada año</h3>

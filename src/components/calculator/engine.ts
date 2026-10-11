@@ -181,46 +181,6 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
   var started = false;
   function markStart(){ if(started) return; started = true; host.track("calculator_start"); }
   var copyTimer = null; // El resultado no lleva botón de agenda (quien llega aquí ya ha reservado): la acción es copiar el enlace
-  function videoEmbed(u){
-    try{
-      var x = new URL(u, location.href), h = x.hostname.replace(/^www\./,""), m;
-      var okProto = x.protocol==="https:" || (x.protocol==="http:" && x.hostname===location.hostname);
-      if(!okProto) return null;
-      if(/\.mp4$/i.test(x.pathname)) return {kind:"file", src:x.href};
-      if(x.protocol!=="https:") return null;
-      if(h==="youtu.be") return {kind:"iframe", src:"https://www.youtube-nocookie.com/embed/"+x.pathname.slice(1)};
-      if(h==="youtube.com" || h==="youtube-nocookie.com"){
-        if(x.pathname.indexOf("/embed/")===0) return {kind:"iframe", src:"https://www.youtube-nocookie.com"+x.pathname};
-        var id = x.searchParams.get("v"); return id ? {kind:"iframe", src:"https://www.youtube-nocookie.com/embed/"+id} : null;
-      }
-      if(h==="vimeo.com"){ m = x.pathname.match(/(\d+)/); return m ? {kind:"iframe", src:"https://player.vimeo.com/video/"+m[1]} : null; }
-      if(h==="player.vimeo.com") return {kind:"iframe", src:x.href};
-      if(h==="loom.com"){ m = x.pathname.match(/\/(?:share|embed)\/([A-Za-z0-9]+)/); return m ? {kind:"iframe", src:"https://www.loom.com/embed/"+m[1]} : null; }
-    }catch(e){}
-    return null;
-  }
-  var vidSrc = null;
-  function renderVideo(){
-    var v = (CFG.showVideo && CFG.videoUrl) ? videoEmbed(CFG.videoUrl) : null, sec = $("videoSec");
-    vidSrc = v; sec.hidden = !v;
-    if(!v) return;
-    if(CFG.videoPoster && !$("videoPlay").style.backgroundImage) $("videoPlay").style.backgroundImage = 'url("' + CFG.videoPoster + '")';
-  }
-  on($("videoPlay"), "click", function(){
-    if(!vidSrc) return;
-    var box = $("videoBox"), el;
-    if(vidSrc.kind==="iframe"){
-      el = document.createElement("iframe");
-      el.setAttribute("allow", "accelerometer; clipboard-write; encrypted-media; picture-in-picture; fullscreen autoplay");
-      el.setAttribute("allowfullscreen", ""); el.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
-      el.title = $("t-vid").textContent;
-      el.src = vidSrc.src + (vidSrc.src.indexOf("?")<0 ? "?" : "&") + "autoplay=1";
-    } else {
-      el = document.createElement("video"); el.controls = true; el.autoplay = true; el.setAttribute("playsinline", ""); el.src = vidSrc.src;
-    }
-    box.appendChild(el); this.hidden = true;
-  });
-
   function canNext1(r){ return r.people>=1 && r.team>0; }
 
   var maxStep = 1;
@@ -307,7 +267,7 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
     $("billNote").innerHTML = (state.plan==="annual" || r.netIfAnnual<=0)
       ? tr("noteA",{s:eur(r.costMonthly - r.costAnnual)})
       : tr("noteM",{s:eur(r.costMonthly - r.costAnnual), n:eur(r.netIfAnnual)});
-    renderVideo(); announce();
+    announce();
     renderTable(r);
     return r;
   }
