@@ -67,7 +67,7 @@ export const siteConfig = {
   } as Record<LandingSlug, LandingRuntime>,
 
   /** Reserva de la llamada: todos los botones "Agendar mi llamada" llevan aquí, en la misma pestaña. */
-  bookingUrl: "https://meetz.pro/fivo-ai",
+  bookingUrl: "https://meetz.pro/fivo-infoproductores",
 
   calendar: {
     /** Duración en minutos (también para el .ics). */
