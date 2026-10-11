@@ -556,11 +556,9 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
       if(!host.sheetUrl) return;
       var r = compute(state); if(!r.ready) return;
       sheetSig = stateSig();
-      var em = ($("ctaEmail") && $("ctaEmail").value || "").trim();
-      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) em = "";
       var sec = state.sector ? $("sec-"+state.sector) : null;
       var body = {
-        tipo:"calculo", reserva_id:host.reservaId() || "", sesion:host.sessionId(), landing:host.landing, evento:evento, email:em,
+        tipo:"calculo", reserva_id:host.reservaId() || "", sesion:host.sessionId(), landing:host.landing, evento:evento, email:"",
         sector: sec ? sec.querySelector("span").textContent : "",
         comerciales:r.reps, resto_equipo:r.rest, gasto_anual:r.team, ingresos_anuales:r.calls,
         graba_llamadas: state.recCalls ? optText("recCalls", state.recCalls) : "",

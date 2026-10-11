@@ -5,7 +5,6 @@ import { CheckCircle } from "@phosphor-icons/react";
 import { siteConfig } from "@/config/site";
 import type { LandingContent } from "@/content/types";
 import { readBooking, type BookingInfo } from "@/lib/booking";
-import { getReservaId } from "@/lib/reserva";
 import { CalendarAdd } from "./CalendarAdd";
 import { TestimonialCard } from "./Testimonial";
 import { CalculatorSection } from "./calculator/CalculatorSection";
@@ -28,7 +27,6 @@ export function ThanksContent({ content }: { content: LandingContent }) {
   useLayoutEffect(() => {
     const b = readBooking();
     document.documentElement.toggleAttribute("data-booking", Boolean(b));
-    document.documentElement.toggleAttribute("data-reserva", Boolean(getReservaId()));
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setBooking(b);
   }, []);

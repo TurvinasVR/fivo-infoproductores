@@ -451,27 +451,3 @@ html[data-booking] .cal-slot { display: inline-block; }
 /* Iconos con el degradado (el <linearGradient id="fivo-grad"> está en el layout). Se activa tras la carga: ver BrandIcons */
 .icon-brand { fill: var(--color-accent); }
 html[data-brand-icons] .icon-brand { fill: url(#fivo-grad); }
-
-/* Campo de formulario (fv-field): 40px, borde line, acento al enfocar */
-.fv-field {
-  width: 100%;
-  min-height: 40px;
-  padding: 0 0.75rem;
-  background: var(--color-surface-2);
-  color: var(--color-fg);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-field);
-  font: inherit;
-  font-size: 1rem;
-  transition: border-color 0.15s;
-}
-.fv-field::placeholder {
-  color: var(--color-fg-subtle);
-}
-.fv-field:hover {
-  border-color: var(--color-line-strong);
-}
-.fv-field:focus-visible {
-  outline: none;
-  border-color: var(--color-accent);
-}
