@@ -13,7 +13,6 @@ export type CtaPosition =
   | "barra"
   | "hero"
   | "video_end"
-  | "llamada"
   | "fijo-movil"
   | "gracias"
   | "herramientas"
@@ -21,7 +20,6 @@ export type CtaPosition =
   | "como-funciona"
   | "pregunta"
   | "pregunta-enlace"
-  | "para-quien"
   | "prueba"
   | "faq";
 

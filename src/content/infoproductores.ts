@@ -17,7 +17,6 @@ export const infoproductores: LandingContent = {
     problema: "Así se ve con Fivo. En la llamada lo vemos con tu negocio.",
     "como-funciona": "Te lo enseñamos con un negocio como el tuyo en **30 minutos**.",
     pregunta: "¿Qué le preguntarías tú a tu negocio? Tráelo a la llamada y lo vemos.",
-    "para-quien": "¿Te has visto reflejado? Hablemos.",
     prueba: "Mira si encaja con tu negocio.",
     faq: "¿Te queda alguna duda? Resuélvela en la llamada.",
   },
@@ -218,47 +217,10 @@ export const infoproductores: LandingContent = {
     ],
   },
 
-  who: {
-    title: "Para quién es Fivo",
-    yes: {
-      label: "Es para ti si",
-      items: [
-        "Ya vendes y tienes equipo",
-        "Tus ventas pasan por llamadas con closers",
-        "Usas varias herramientas y la información está repartida",
-        "Quieres que tu IA conozca tu negocio",
-      ],
-    },
-    no: {
-      label: "No es para ti si",
-      items: ["Estás empezando y trabajas solo", "Buscas solo una herramienta para grabar llamadas"],
-    },
-  },
-
   proof: {
     title: "Fivo ya funciona a esta escala",
     scale: SCALE,
-    logos: true,
     testimonials: [],
-  },
-
-  agenda: {
-    title: "Qué pasa en los 30 minutos",
-    segments: [
-      { range: "0 a 10 min", text: "Repasamos qué herramientas usas y cuánta gente tienes." },
-      { range: "10 a 25 min", text: "Te enseñamos Fivo con un negocio como el tuyo." },
-      { range: "25 a 30 min", text: "Te decimos si te compensa o no." },
-    ],
-    srList: [
-      "Repasamos qué herramientas usas y cuánta gente tienes.",
-      "Te enseñamos Fivo con un negocio como el tuyo.",
-      "Te decimos si te compensa o no.",
-      "30 minutos, por videollamada, sin compromiso. No es para ti si trabajas solo y sin equipo.",
-    ],
-    askText: "¿Cómo va mi lanzamiento?",
-    fork: ["Compensa", "No compensa"],
-    facts: ["30 minutos", "Por videollamada", "Sin compromiso"],
-    note: "No es para ti si trabajas solo y sin equipo.",
   },
 
   booking: {

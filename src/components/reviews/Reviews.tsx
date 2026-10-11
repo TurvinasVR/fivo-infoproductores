@@ -5,10 +5,11 @@ import { ArrowLeft, ArrowRight, Star } from "@phosphor-icons/react";
 import { REVIEWS } from "./reviewsData";
 
 /**
- * Opiniones de la calculadora original, bajo el resultado (solo en el paso 4). Carrusel con scroll nativo: se pasa con el
+ * Opiniones de la calculadora original (mismas 10, una sola fuente: reviewsData.ts). Se usan bajo el resultado de /gracias y en la landing. Carrusel con scroll nativo: se pasa con el
  * dedo o la rueda y con las flechas. Tarjetas planas en surface, sin cajas dentro de cajas.
  */
-export default function Reviews() {
+export default function Reviews({ headingLevel = 3, className = "mt-14 lg:mt-20" }: { headingLevel?: 2 | 3; className?: string }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const track = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -39,11 +40,11 @@ export default function Reviews() {
     "inline-flex size-11 items-center justify-center rounded-full border border-line text-fg transition-colors hover:border-line-strong hover:bg-surface-2 disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent";
 
   return (
-    <section aria-labelledby="opiniones" className="mt-14 lg:mt-20">
+    <section aria-labelledby="opiniones" className={className}>
       <div className="flex items-end justify-between gap-4">
-        <h3 id="opiniones" className="font-display text-[clamp(1.375rem,1rem+1.4vw,1.875rem)] font-black leading-tight tracking-[-0.015em]">
+        <Heading id="opiniones" className="font-display text-[clamp(1.375rem,1rem+1.4vw,1.875rem)] font-black leading-tight tracking-[-0.015em]">
           Opiniones sobre Fivo
-        </h3>
+        </Heading>
         <div className="hidden gap-2 sm:flex">
           <button type="button" className={arrow} onClick={() => go(-1)} disabled={atStart} aria-label="Opinión anterior">
             <ArrowLeft size={20} aria-hidden />

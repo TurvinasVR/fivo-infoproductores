@@ -1,7 +1,6 @@
 "use client";
 
 import { siteConfig } from "@/config/site";
-import { ClientLogos } from "./ClientLogos";
 import { Reveal } from "./Reveal";
 import { TestimonialCard } from "./Testimonial";
 import { BlockCta } from "./landing/BlockCta";
@@ -38,13 +37,6 @@ export function Proof() {
             </Reveal>
           ))}
         </dl>
-        {proof.logos && (
-          <div className="mt-10 border-t border-line pt-8 lg:mt-14">
-            <p className="mb-5 text-center text-[14px] font-medium text-fg-muted">Clientes de Fivo</p>
-            <ClientLogos />
-          </div>
-        )}
-
         {showTestimonials && (
           <div className="mt-12 grid gap-4 lg:mt-16 lg:grid-cols-12 lg:gap-5">
             <Reveal className="lg:col-span-7">

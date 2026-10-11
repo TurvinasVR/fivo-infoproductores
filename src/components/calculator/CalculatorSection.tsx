@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Calculator } from "./Calculator";
 
 // Las opiniones solo se piden al llegar al resultado y en su propio fragmento: no retrasan nada de lo anterior
-const Reviews = dynamic(() => import("./Reviews"), { ssr: false });
+const Reviews = dynamic(() => import("../reviews/Reviews"), { ssr: false });
 
 const heading = "font-display text-[clamp(1.375rem,1rem+1.6vw,2rem)] font-black leading-[1.15] tracking-[-0.015em]";
 const sub = "mt-2 text-[15px] text-fg-muted sm:text-base";

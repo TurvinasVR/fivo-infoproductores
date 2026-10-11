@@ -138,27 +138,10 @@ export type LandingContent = {
     questions: AskQuestion[];
   };
 
-  who?: {
-    title: string;
-    yes: { label: string; items: string[] };
-    no: { label: string; items: string[] };
-  };
-
   proof: {
     title: string;
     scale: ScaleFigure[];
-    logos: boolean;
     testimonials: TestimonialData[];
-  };
-
-  agenda: {
-    title: string;
-    segments: { range: string; text: string }[];
-    srList: string[];
-    askText: string;
-    fork: [string, string];
-    facts: string[];
-    note: string;
   };
 
   booking: {
