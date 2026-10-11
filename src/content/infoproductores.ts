@@ -342,7 +342,7 @@ export const infoproductores: LandingContent = {
     calculator: {
       title: "Mientras llega la llamada, calcula cuánto te ahorraría Fivo",
       intro: "Tráelo a la llamada y lo vemos con tus números.",
-      resultTitle: "Este es tu cálculo",
+      resultTitle: "Esto es lo que Fivo podría sumar a tu negocio cada año",
     },
   },
 };
