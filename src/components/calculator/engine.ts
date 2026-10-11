@@ -545,6 +545,12 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
     if(!state.audOn) a.push("sin análisis externo");
     return a.join("; ");
   }
+  // Tramo elegido en "¿Cuánto gastáis al año en ellos?", tal como se ve ahora en pantalla (las opciones cambian con los ingresos)
+  function consultTierText(){
+    if(state.hasConsult!=="yes" || state.consultTier<0) return "";
+    var i = root.querySelector('input[name="consultTier"][value="'+state.consultTier+'"]');
+    return i && i.nextElementSibling ? i.nextElementSibling.textContent.trim() : "";
+  }
   function sendSheet(evento){
     try{
       if(!host.sheetUrl) return;
@@ -560,6 +566,7 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
         graba_llamadas: state.recCalls ? optText("recCalls", state.recCalls) : "",
         revision_externa: state.hasConsult ? optText("hasConsult", state.hasConsult) : "",
         optimizar_areas: state.optimize ? optText("optimize", state.optimize) : "",
+        gasto_revision_externa: consultTierText(),
         gasto_apps_mes:r.appsM,
         gasto_grabacion_mes: state.appsUnknown ? "no lo sé" : r.appsRepIn,
         herramientas: group(r.appsM) + " al mes en aplicaciones; " + (state.appsUnknown ? "no sabe cuánto en grabación (estimado " + group(r.subM) + " al mes)" : group(r.appsRepIn) + " al mes en grabación y transcripción"),
