@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "@phosphor-icons/react";
 import { siteConfig } from "@/config/site";
 import { track } from "@/lib/analytics";
-import { withUtm } from "@/lib/utm";
+import { refUrl, withUtm } from "@/lib/utm";
 
 export const CTA_LABEL = "Agendar mi llamada";
 
@@ -55,7 +55,7 @@ export function CtaButton({
   label = CTA_LABEL,
 }: Props) {
   const ref = useRef<HTMLAnchorElement>(null);
-  const [href, setHref] = useState(siteConfig.bookingUrl);
+  const [href, setHref] = useState(refUrl(siteConfig.bookingUrl));
   useEffect(() => setHref(withUtm(siteConfig.bookingUrl)), []);
 
   // Brillo de entrada: una sola vez, la primera vez que el botón entra en pantalla (en CSS se anula con movimiento reducido)

@@ -17,6 +17,11 @@ export type CalculatorHost = {
   callWhen: () => string | null;
   /** Frase de cierre del PDF. */
   disclaimer: string;
+  /** Hoja de Google que recibe el cálculo, nombre de la landing y ids de reserva y de visita. */
+  sheetUrl: string;
+  landing: string;
+  reservaId: () => string;
+  sessionId: () => string;
 };
 
 export function initCalculator(root: HTMLElement, host: CalculatorHost): () => void {
@@ -205,7 +210,7 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
     var first = n===LAST && !calcDone && compute(state).ready;
     if(first) calcDone = true;
     state.step = n; root.classList.add("anim"); renderSteps(); render();
-    if(first){ revealResult(); host.track("calculator_complete", trackParams()); } else if(n!==LAST) announce();
+    if(first){ revealResult(); host.track("calculator_complete", trackParams()); sendSheet("resultado"); } else if(n!==LAST) announce();
     var f = root.closest("[data-calc-section]") || $("calc"); if(f && f.scrollIntoView) f.scrollIntoView({behavior: reduced?"auto":"smooth", block:"start"});
   }
 
@@ -267,6 +272,7 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
       ? tr("noteA",{s:eur(r.costMonthly - r.costAnnual)})
       : tr("noteM",{s:eur(r.costMonthly - r.costAnnual), n:eur(r.netIfAnnual)});
     announce();
+    watchChanges();
     renderTable(r);
     return r;
   }
@@ -527,6 +533,49 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
       disclaimer:host.disclaimer, callWhen:host.callWhen()
     };
   }
+  // ---- Envío del cálculo a la hoja de Google (al llegar al resultado, al cambiar datos y al descargar el PDF) ----
+  // Nunca puede romper ni frenar la calculadora ni el PDF: todo va en try/catch y el fetch no se espera.
+  var sheetSig = "", sheetTimer = null;
+  function stateSig(){ return [state.sector,state.reps,state.rest,state.team,state.calls,state.recCalls,state.hasConsult,state.consultTier,state.optimize,state.apps,state.appsRep,state.appsUnknown,state.rec,state.uplift,state.subst,state.plan,state.audOn,state.revOn].join("|"); }
+  function movedAssumptions(r){
+    var a = [];
+    if(r.rec!==CFG.recDefault) a.push("tiempo recuperado " + pct(r.rec));
+    if(!state.revOn) a.push("sin mejora de ventas"); else if(state.upliftSet) a.push("mejora de ventas " + pct(r.uplift));
+    if(Math.round(r.subst)!==100) a.push("herramientas sustituidas " + pct(Math.round(r.subst)));
+    if(!state.audOn) a.push("sin análisis externo");
+    return a.join("; ");
+  }
+  function sendSheet(evento){
+    try{
+      if(!host.sheetUrl) return;
+      var r = compute(state); if(!r.ready) return;
+      sheetSig = stateSig();
+      var em = ($("ctaEmail") && $("ctaEmail").value || "").trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) em = "";
+      var sec = state.sector ? $("sec-"+state.sector) : null;
+      var body = {
+        tipo:"calculo", reserva_id:host.reservaId() || "", sesion:host.sessionId(), landing:host.landing, evento:evento, email:em,
+        sector: sec ? sec.querySelector("span").textContent : "",
+        comerciales:r.reps, resto_equipo:r.rest, gasto_anual:r.team, ingresos_anuales:r.calls,
+        herramientas: group(r.appsM) + " al mes en aplicaciones; " + (state.appsUnknown ? "no sabe cuánto en grabación (estimado " + group(r.subM) + " al mes)" : group(r.appsRepIn) + " al mes en grabación y transcripción"),
+        supuestos:movedAssumptions(r),
+        ahorro:r.save, ganancia:r.earn, neto_anual:r.net, coste_mes:monthlyCost(r),
+        facturacion: state.plan==="annual" ? "anual" : "mensual",
+        website:""
+      };
+      fetch(host.sheetUrl, {method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body), keepalive:true}).catch(function(){});
+    }catch(e){}
+  }
+  // Un cambio en el resultado se manda 2 s después del último movimiento
+  function watchChanges(){
+    try{
+      if(!calcDone || stateSig()===sheetSig) return;
+      clearTimeout(sheetTimer);
+      sheetTimer = setTimeout(function(){ if(stateSig()!==sheetSig) sendSheet("cambio"); }, 2000);
+      timers.push(sheetTimer);
+    }catch(e){}
+  }
+
   var pdfBusy = false, pdfTimer = null;
   function pdfBtns(){ return [$("ctaPdf"), $("pdfBtn")].filter(Boolean); }
   function pdfLabel(btn, text){ var s = btn.querySelector("span"); (s || btn).textContent = text; }
@@ -542,6 +591,7 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
       return mod.buildCalculatorPdf(model).then(function(blob){ mod.saveBlob(blob, "calculo-fivo.pdf"); });
     }).then(function(){
       host.track("calculator_pdf", trackParams());
+      sendSheet("pdf");
       pdfBtns().forEach(function(b){ pdfLabel(b, tr("pdfDone")); });
       $("srStatus").textContent = tr("pdfDone");
       pdfTimer = setTimeout(pdfIdle, 3500); timers.push(pdfTimer);

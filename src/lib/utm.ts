@@ -1,3 +1,5 @@
+import { currentLanding } from "./analytics";
+
 const KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid", "fbclid"] as const;
 const STORE = "fivo-utm";
 
@@ -24,18 +26,21 @@ export function captureUtm(): Utm {
 
 const PASS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"] as const;
 
-/** El enlace de reserva con los utm_ de la URL actual, si trae alguno; si no, tal cual. */
-export function withUtm(url: string): string {
-  if (typeof window === "undefined") return url;
-  const from = new URLSearchParams(window.location.search);
+/** El enlace de reserva solo con ref=<landing> (lo que se puede pintar en el HTML del servidor). */
+export function refUrl(url: string): string {
   const u = new URL(url);
-  let any = false;
+  u.searchParams.set("ref", currentLanding());
+  return u.toString();
+}
+
+/** El enlace de reserva con ref=<landing> y los utm_ de la URL actual, si trae alguno. */
+export function withUtm(url: string): string {
+  if (typeof window === "undefined") return refUrl(url);
+  const from = new URLSearchParams(window.location.search);
+  const u = new URL(refUrl(url));
   for (const k of PASS) {
     const v = from.get(k);
-    if (v) {
-      u.searchParams.set(k, v.slice(0, 200));
-      any = true;
-    }
+    if (v) u.searchParams.set(k, v.slice(0, 200));
   }
-  return any ? u.toString() : url;
+  return u.toString();
 }

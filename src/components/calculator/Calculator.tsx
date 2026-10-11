@@ -2,7 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { currentLanding, track } from "@/lib/analytics";
+import { siteConfig } from "@/config/site";
 import { readBooking } from "@/lib/booking";
+import { getReservaId, getSessionId } from "@/lib/reserva";
 import { CALCULATOR_HTML } from "./markup";
 import "./calculator.css";
 
@@ -31,6 +33,10 @@ export function Calculator({ disclaimer }: { disclaimer: string }) {
         track: (name, params) => track(name, params),
         source: `gracias-${currentLanding()}`,
         disclaimer,
+        sheetUrl: siteConfig.sheetUrl,
+        landing: currentLanding(),
+        reservaId: getReservaId,
+        sessionId: getSessionId,
         callWhen: () => {
           const b = readBooking();
           return b ? callFmt.format(b.startsAt) : null;

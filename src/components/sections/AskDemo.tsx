@@ -7,7 +7,7 @@ import { typeInto, useInView, useReducedMotion } from "@/lib/hooks";
 import { useLanding } from "../landing/LandingContext";
 import { siteConfig } from "@/config/site";
 import { track } from "@/lib/analytics";
-import { withUtm } from "@/lib/utm";
+import { refUrl, withUtm } from "@/lib/utm";
 
 /* ------------------------------------------------------------------ datos */
 
@@ -183,7 +183,7 @@ function Answer({ q, parts }: { q: Q; parts: number }) {
 
 export default function AskDemo() {
   // Enlace de reserva (meetz) con los utm_ de la URL, si los hay
-  const [bookingHref, setBookingHref] = useState(siteConfig.bookingUrl);
+  const [bookingHref, setBookingHref] = useState(refUrl(siteConfig.bookingUrl));
   useEffect(() => setBookingHref(withUtm(siteConfig.bookingUrl)), []);
   const { ask } = useLanding();
   const QUESTIONS = ask.questions;

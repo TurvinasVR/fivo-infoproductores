@@ -333,7 +333,14 @@ html.md-open {overflow:hidden}
 .calc .cta {display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 32px;margin-top:24px;padding:28px;border:1px solid var(--line-2);border-radius:var(--r-md);background:color-mix(in srgb, var(--color-grad-a) 8%, transparent)}
 .calc .cta h4 {grid-column:1;margin:0;font-family:var(--font);font-size:24px;font-weight:600;line-height:1.25;letter-spacing:-.015em;text-wrap:balance}
 .calc .rs-small {grid-column:1;margin:0;font-size:15px;line-height:1.45;color:var(--label)}
-.calc .btn-main {grid-column:2;grid-row:1;min-height:60px;padding:0 2rem;font-size:1.125rem}
+.calc .cta-email {grid-column:1;grid-row:2}
+.calc .cta-email label {display:block;margin:0 0 6px;font-size:13.5px;color:var(--label)}
+.calc .cta-email label span {color:var(--ph)}
+html[data-reserva] .calc .cta-email {display:none}
+.calc .cta-act {grid-column:2;grid-row:1/span 2;display:flex;flex-direction:column;gap:10px;max-width:290px}
+.calc .cta-note {margin:0;font-size:12.5px;line-height:1.45;color:var(--color-fg-muted)}
+.calc .cta-note a {color:inherit;text-decoration:underline;text-underline-offset:2px}
+.calc .btn-main {min-height:60px;padding:0 2rem;font-size:1.125rem}
 .calc .btn-main svg {width:20px;height:20px;flex:none}
 .calc .rs-est {grid-column:1/-1;margin:8px 0 0;font-size:13.5px;color:var(--ph)}
 .calc .rs-est .rs-link {color:var(--color-fg)}
@@ -370,7 +377,9 @@ html.md-open {overflow:hidden}
   .calc .cta {display:block;padding:20px}
   .calc .cta h4 {font-size:21px}
   .calc .rs-small {margin-top:8px}
-  .calc .btn-main {display:flex;width:100%;margin-top:16px}
+  .calc .cta-act {display:flex;max-width:none;margin-top:16px}
+  .calc .cta-email {margin-top:14px}
+  .calc .btn-main {display:flex;width:100%}
   .calc .rs-est {margin-top:14px}
 }
 .calc .rs-calc, .calc .range-row .top, .calc .tbl, .calc .input input, .calc .input .unit {font-variant-numeric:tabular-nums}

@@ -136,7 +136,14 @@ export const CALCULATOR_HTML = `<div id="page">
 <p class="rs-price" id="priceMsg"></p>
 <div class="cta" id="ctaBox">
 <h4 id="ctaTitle">Descárgalo y tráelo a tu llamada. Lo revisamos juntos.</h4>
+<div class="cta-email">
+<label for="ctaEmail">¿Con qué email has reservado? <span>(opcional)</span></label>
+<input autocomplete="email" class="fv-field" id="ctaEmail" inputmode="email" name="email" placeholder="tu@email.com" type="email"/>
+</div>
+<div class="cta-act">
 <button class="btn-cta btn-main" id="ctaPdf" type="button"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19.5h14"></path></svg><span id="ctaPdfText">Descargar mi cálculo en PDF</span></button>
+<p class="cta-note">Guardamos tu cálculo para preparar tu llamada. Más información en la <a href="/legal/privacidad" rel="noopener" target="_blank">política de privacidad</a>.</p>
+</div>
 <p class="rs-est"><span data-i18n="r030">Estimación a partir de tus datos</span> · <button class="rs-link" data-i18n="r031" id="openCalc" type="button">Ver cómo se calcula</button></p>
 </div>
 </div></div>

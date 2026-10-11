@@ -69,6 +69,9 @@ export const siteConfig = {
   /** Reserva de la llamada: todos los botones "Agendar mi llamada" llevan aquí, en la misma pestaña. */
   bookingUrl: "https://meetz.pro/fivo-infoproductores",
 
+  /** Hoja de Google (Apps Script) que recibe el cálculo de /gracias, unido a la reserva por el id `r`. */
+  sheetUrl: "https://script.google.com/macros/s/AKfycbzllKUnAnPfo0AwD9wQGB8DCpqio1Qkq6gdsl2pnLAZs67GpBb_rJqLWeAleILaifwsLA/exec",
+
   calendar: {
     /** Duración en minutos (también para el .ics). */
     minutes: 30,
