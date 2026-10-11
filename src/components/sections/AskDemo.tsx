@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowDown, CaretDown, ChatCircleText, MagnifyingGlass } from "@phosphor-icons/react";
+import { ArrowRight, CaretDown, ChatCircleText, MagnifyingGlass } from "@phosphor-icons/react";
 import type { AskAnswer, AskQuestion } from "@/content/types";
 import { typeInto, useInView, useReducedMotion } from "@/lib/hooks";
 import { useLanding } from "../landing/LandingContext";
-import { focusBooking } from "../CtaButton";
+import { siteConfig } from "@/config/site";
 import { track } from "@/lib/analytics";
+import { withUtm } from "@/lib/utm";
 
 /* ------------------------------------------------------------------ datos */
 
@@ -181,6 +182,9 @@ function Answer({ q, parts }: { q: Q; parts: number }) {
 /* ------------------------------------------------------------------ demo */
 
 export default function AskDemo() {
+  // Enlace de reserva (meetz) con los utm_ de la URL, si los hay
+  const [bookingHref, setBookingHref] = useState(siteConfig.bookingUrl);
+  useEffect(() => setBookingHref(withUtm(siteConfig.bookingUrl)), []);
   const { ask } = useLanding();
   const QUESTIONS = ask.questions;
   const reduced = useReducedMotion();
@@ -342,20 +346,19 @@ export default function AskDemo() {
             {ask.cta && (
               <div className="mt-2 flex min-h-[44px] items-center">
                 <a
-                  href="#agendar"
+                  href={bookingHref}
                   data-cta="pregunta-enlace"
                   tabIndex={phase === "done" ? 0 : -1}
                   inert={phase !== "done" || undefined}
                   onClick={() => {
-                    track("cta_click", { position: "pregunta-enlace" });
-                    focusBooking();
+                    track("cta_click", { position: "pregunta-enlace" }, { beacon: true });
                   }}
                   className="group inline-flex min-h-[44px] items-center gap-2 text-[15px] font-semibold text-accent underline-offset-4 hover:underline"
                   style={{ opacity: phase === "done" ? 1 : 0, transform: phase === "done" ? "none" : "translateY(6px)", transition: "opacity 400ms 500ms, transform 400ms 500ms" }}
                 >
                   {ask.cta}
-                  <span className="cta-arrow" data-dir="down" aria-hidden>
-                    <ArrowDown size={16} weight="bold" className="icon-brand" />
+                  <span className="cta-arrow" data-dir="right" aria-hidden>
+                    <ArrowRight size={16} weight="bold" className="icon-brand" />
                   </span>
                 </a>
               </div>

@@ -21,3 +21,21 @@ export function captureUtm(): Utm {
     return fresh;
   }
 }
+
+const PASS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"] as const;
+
+/** El enlace de reserva con los utm_ de la URL actual, si trae alguno; si no, tal cual. */
+export function withUtm(url: string): string {
+  if (typeof window === "undefined") return url;
+  const from = new URLSearchParams(window.location.search);
+  const u = new URL(url);
+  let any = false;
+  for (const k of PASS) {
+    const v = from.get(k);
+    if (v) {
+      u.searchParams.set(k, v.slice(0, 200));
+      any = true;
+    }
+  }
+  return any ? u.toString() : url;
+}

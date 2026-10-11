@@ -223,57 +223,6 @@ export const infoproductores: LandingContent = {
     testimonials: [],
   },
 
-  booking: {
-    title: "Elige hora para tu llamada",
-    freeTitle: "Gracias por tu interés",
-    sub: "Te lleva **30 segundos**.",
-    next: ["Eliges día y hora en el calendario.", "Ves la confirmación de tu cita.", "Hablamos **30 minutos** por videollamada."],
-    free: {
-      headline: "Esta llamada es para infoproductores que ya tienen equipo.",
-      text: "Si trabajas solo, lo mejor es que empieces gratis por tu cuenta. Si tu equipo crece, aquí estaremos.",
-      cta: "Empieza gratis",
-    },
-    form: {
-      emailLabel: "Email",
-      whatsappHelp: "Con prefijo si no es de España.\nPor si necesitamos cambiar la hora de la llamada.",
-      choices: [
-        {
-          name: "equipo",
-          label: "Personas en tu equipo",
-          control: "cards",
-          options: "equipo",
-          layout: "2/4",
-          help: "Esta llamada es para quien ya tiene equipo.",
-          error: "Elige cuántas personas hay en tu equipo.",
-          summary: "Equipo: {label}",
-        },
-        {
-          name: "facturacion",
-          label: "Facturación mensual",
-          control: "cards",
-          options: "facturacion",
-          layout: "1/2",
-          error: "Elige tu facturación mensual.",
-          summary: "Facturación: {label}",
-        },
-        {
-          name: "prioridad",
-          label: "Qué quieres resolver primero",
-          control: "cards",
-          options: "prioridad",
-          layout: "1/3=",
-          error: "Elige qué quieres resolver primero.",
-          summary: "{label}",
-        },
-      ],
-      submitHint: "Al enviar, eliges día y hora en el calendario.",
-      analytics: {
-        submit: { team: "equipo", revenue: "facturacion", priority: "prioridad" },
-        booked: { team: "equipo", revenue: "facturacion", priority: "prioridad" },
-      },
-    },
-  },
-
   faq: {
     title: "Preguntas frecuentes",
     items: [

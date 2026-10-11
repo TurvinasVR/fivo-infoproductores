@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { inView, watchCtas } from "@/lib/ctaFlow";
+import { watchCtas } from "@/lib/ctaFlow";
 import { CtaButton } from "./CtaButton";
 
 /**
@@ -9,20 +9,15 @@ import { CtaButton } from "./CtaButton";
  *
  * La barra es fija en escritorio y en móvil, por encima de todo el contenido y de las escenas del grafo
  * y por debajo del aviso de cookies. En lo alto de la página no tiene fondo; al pasar contenido por
- * debajo aparece su fondo (bg al 85 % con desenfoque y borde inferior, ver .topbar en globals.css). Compacta al hacer scroll. Su botón lleva el degradado de marca, como todos los "Agendar mi llamada". Con el formulario a la vista, el
- * botón se oculta: no tiene sentido apuntar a lo que ya se está viendo.
+ * debajo aparece su fondo (bg al 85 % con desenfoque y borde inferior, ver .topbar en globals.css). Compacta al hacer scroll. Su botón lleva el degradado de marca, como todos los "Agendar mi llamada".
  */
 export function TopBar() {
   const [scrolled, setScrolled] = useState(false);
-  const [formOn, setFormOn] = useState(false);
 
   useEffect(
     () =>
       watchCtas(() => {
         setScrolled(window.scrollY > 8);
-        const form = document.getElementById("agendar");
-        const formIn = !!form && inView(form, -80);
-        setFormOn(formIn);
       }),
     [],
   );
@@ -33,14 +28,7 @@ export function TopBar() {
         {/* Logotipo oficial de fivo.ai (versión blanca del encabezado), sin redibujar */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logos/fivo-wordmark-white.svg" alt="Fivo" width={103} height={33} className="h-[30px] w-auto" />
-        <div
-          inert={formOn || undefined}
-          aria-hidden={formOn || undefined}
-          className="transition-opacity duration-300"
-          style={{ opacity: formOn ? 0 : 1, visibility: formOn ? "hidden" : "visible", transitionProperty: "opacity, visibility" }}
-        >
-          <CtaButton position="barra" size="sm" topbar />
-        </div>
+        <CtaButton position="barra" size="sm" topbar />
       </div>
     </header>
   );

@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { ArrowDown, ArrowUp } from "@phosphor-icons/react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowRight } from "@phosphor-icons/react";
+import { siteConfig } from "@/config/site";
 import { track } from "@/lib/analytics";
+import { withUtm } from "@/lib/utm";
 
 export const CTA_LABEL = "Agendar mi llamada";
-/** Texto del botón de enviar del formulario: describe el paso siguiente. */
-export const SUBMIT_LABEL = "Elegir día y hora";
 
 /** Cada ubicación tiene su propio nombre, para saber qué botón convierte. */
 export type CtaPosition =
@@ -42,25 +42,7 @@ type Props = {
   label?: string;
 };
 
-/**
- * Pone el foco en el formulario una vez hecho el salto: en el primer campo (teclado y lector de pantalla
- * llegan directos a rellenar); en pantallas táctiles, en el título, para no abrir el teclado del móvil
- * encima del formulario. El formulario puede estar aún montándose: se reintenta unos instantes.
- */
-export function focusBooking() {
-  let tries = 0;
-  const coarse = window.matchMedia("(pointer: coarse)").matches;
-  const go = () => {
-    const field = document.getElementById("nombre");
-    const usable = field && !field.closest("[inert], [hidden]");
-    const target = coarse || !usable ? document.getElementById("agendar-titulo") : field;
-    if (target) target.focus({ preventScroll: true });
-    else if (tries++ < 12) window.setTimeout(go, 150);
-  };
-  window.setTimeout(go, 500);
-}
-
-/** La única acción de la página: baja al bloque del formulario. */
+/** La única acción de la página: lleva a la reserva (meetz), en la misma pestaña, con los utm_ de la URL si los hay. */
 export function CtaButton({
   position,
   size = "lg",
@@ -73,6 +55,8 @@ export function CtaButton({
   label = CTA_LABEL,
 }: Props) {
   const ref = useRef<HTMLAnchorElement>(null);
+  const [href, setHref] = useState(siteConfig.bookingUrl);
+  useEffect(() => setHref(withUtm(siteConfig.bookingUrl)), []);
 
   // Brillo de entrada: una sola vez, la primera vez que el botón entra en pantalla (en CSS se anula con movimiento reducido)
   useEffect(() => {
@@ -108,27 +92,22 @@ export function CtaButton({
   }, [heroAnchor]);
 
   const sizeCls = size === "xl" ? "btn-cta--xl" : size === "lg" ? "btn-cta--lg" : size === "sm" ? "btn-cta--sm max-sm:px-4" : "";
-  // El formulario queda por encima de las preguntas frecuentes y : ahí el botón sube
-  const up = position === "faq";
-  const Arrow = up ? ArrowUp : ArrowDown;
-
   return (
     <a
       ref={ref}
-      href="#agendar"
+      href={href}
       data-cta={position}
       data-hero-cta={heroAnchor ? "" : undefined}
       data-block-cta={blockCta ? "" : undefined}
       data-topbar={topbar ? "" : undefined}
       className={`${secondary ? `btn-ghost ${size === "sm" ? "max-sm:px-3.5" : ""}` : `btn-cta ${sizeCls}`} ${full ? "w-full" : ""} ${className}`}
       onClick={() => {
-        track("cta_click", { position });
-        focusBooking();
+        track("cta_click", { position }, { beacon: true });
       }}
     >
       {label}
-      <span className="cta-arrow" data-dir={up ? "up" : "down"} aria-hidden>
-        <Arrow size={size === "sm" ? 16 : 18} weight="bold" />
+      <span className="cta-arrow" data-dir="right" aria-hidden>
+        <ArrowRight size={size === "sm" ? 16 : 18} weight="bold" />
       </span>
     </a>
   );

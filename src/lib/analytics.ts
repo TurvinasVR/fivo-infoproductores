@@ -1,16 +1,12 @@
 import { readConsent } from "./consent";
 
-/** Nombres estables. El evento de conversión principal es call_booked. */
+/** Nombres estables. */
 export type AnalyticsEvent =
   | "video_play"
   | "video_50"
   | "video_cta_reached"
   | "video_end_cta_view"
   | "cta_click"
-  | "form_start"
-  | "form_view"
-  | "form_submit"
-  | "call_booked"
   | "calculator_start"
   | "calculator_complete"
   | "calculator_pdf"
@@ -36,25 +32,18 @@ export function currentLanding(): Landing {
   return "infoproductores";
 }
 
-const queue: { name: AnalyticsEvent; params: Params }[] = [];
+const queue: { name: AnalyticsEvent; params: Params; beacon: boolean }[] = [];
 const onceFired = new Set<string>();
 
-// Equivalentes estándar en Meta. call_booked es la conversión principal.
-const META_STANDARD: Partial<Record<AnalyticsEvent, string>> = {
-  form_submit: "Lead",
-  call_booked: "Schedule",
-};
-
-function dispatch(name: AnalyticsEvent, params: Params) {
+function dispatch(name: AnalyticsEvent, params: Params, beacon = false) {
   window.dataLayer = window.dataLayer ?? [];
   window.dataLayer.push({ event: name, ...params });
-  window.gtag?.("event", name, params);
-  const std = META_STANDARD[name];
-  if (std) window.fbq?.("track", std, params);
+  // Con la página a punto de cambiar (botones que salen a otra web), GA4 envía el evento con sendBeacon
+  window.gtag?.("event", name, beacon ? { ...params, transport_type: "beacon" } : params);
   window.fbq?.("trackCustom", name, params);
 }
 
-export function track(name: AnalyticsEvent, extra: Params = {}) {
+export function track(name: AnalyticsEvent, extra: Params = {}, opts: { beacon?: boolean } = {}) {
   if (typeof window === "undefined") return;
   // Todos los eventos llevan el parámetro landing
   const params: Params = { ...extra, landing: currentLanding() };
@@ -64,8 +53,8 @@ export function track(name: AnalyticsEvent, extra: Params = {}) {
     console.debug("[analytics]", name, params);
   }
   const consent = readConsent();
-  if (consent === "granted") dispatch(name, params);
-  else if (consent === null && queue.length < 50) queue.push({ name, params });
+  if (consent === "granted") dispatch(name, params, opts.beacon);
+  else if (consent === null && queue.length < 50) queue.push({ name, params, beacon: Boolean(opts.beacon) });
 }
 
 /** Evento que solo se envía una vez por visita (video_play, video_50...). */
@@ -78,7 +67,7 @@ export function trackOnce(name: AnalyticsEvent, params: Params = {}) {
 export function flushQueue() {
   while (queue.length) {
     const e = queue.shift()!;
-    dispatch(e.name, e.params);
+    dispatch(e.name, e.params, e.beacon);
   }
 }
 
