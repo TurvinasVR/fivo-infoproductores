@@ -13,6 +13,10 @@ export type CalculatorHost = {
   track: (name: CalculatorEvent, params?: Record<string, string | number | boolean>) => void;
   /** Valor del campo `source` de "Enviarme mi informe". */
   source: string;
+  /** Fecha y hora de la llamada ya con formato (reserva guardada o URL del proveedor), o null. */
+  callWhen: () => string | null;
+  /** Frase de cierre del PDF. */
+  disclaimer: string;
 };
 
 export function initCalculator(root: HTMLElement, host: CalculatorHost): () => void {
@@ -63,8 +67,7 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
       chkTools:"Herramientas ({t}) = 12 × {m} al mes que indicas; ",
       chkTail:"{lines} de líneas = {ben} recuperados; {ben} − {cost} = {net}.",
       chkBad:'<b class="bad">Revisa los datos: las cifras no cuadran.</b>',
-      copied:"Enlace copiado. Quien lo abra verá tus mismos números.",
-      copyPrompt:"Copia este enlace:",
+      pdfPreparing:"Preparando PDF…", pdfDone:"PDF descargado", pdfFail:"No hemos podido generar el PDF. Inténtalo de nuevo.",
       emailBad:"Escribe un email válido.",
       needData:"Introduce primero tus datos para generar el informe.",
       sent:"Listo. Hemos enviado tu informe a {email}.",
@@ -180,7 +183,6 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
   function trackParams(){ return {sector: state.sector || "sin_sector", team_size: sizeBucket(members())}; }
   var started = false;
   function markStart(){ if(started) return; started = true; host.track("calculator_start"); }
-  var copyTimer = null; // El resultado no lleva botón de agenda (quien llega aquí ya ha reservado): la acción es copiar el enlace
   function canNext1(r){ return r.people>=1 && r.team>0; }
 
   var maxStep = 1;
@@ -277,14 +279,9 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
 
   function monthlyCost(r){ return Math.round(r.people * (state.plan==="annual" ? CFG.priceAnnual : CFG.priceMonthly) * 100) / 100; }
 
-  function renderTable(r){
+  // Desglose del cálculo como datos: lo pintan la ventana "Cómo se calcula" y el PDF, con los mismos textos y cifras
+  function breakdownModel(r){
     var neg = r.net < 0;
-    var tbl = $("tbl");
-    if(!r.ready){
-      tbl.innerHTML = '<tr><td colspan="2" style="padding:0;border:0"><p class="empty-note">'+tr("empty")+'</p></td></tr>';
-      $("check").innerHTML=""; return;
-    }
-
     var TAG = {own:tr("tagOwn"), ref:tr("tagRef"), est:tr("tagEst")};
     var toolsNote = state.appsUnknown
       ? tr("toolsEst",{pc:pct(Math.round(CFG.unknownShare*100)), a:eur(r.appsM), m:eur(r.subM)})
@@ -296,65 +293,52 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
     else if(r.auditKind==="ref") rowsB.push({key:"audit", label:tr("auditRefLabel"), note:tr("auditRefNote",{pc:pct(Math.round(CFG.auditRefPct*100)), team:eur(r.team), min:eur(CFG.auditRefMin), max:eur(CFG.auditRefMax)}), tag:"ref", amt:r.audit});
     var rowsC = [{key:"time", label:tr("timeLabel"), note:tr("timeNote",{p:pct(r.rec), loss:eur(r.lossToday), n:group(r.people), pl:peopleW(r.people), team:eur(r.team)}), tag:"est", amt:r.time}];
     var rowsD = state.revOn ? [{key:"extra", label:tr("extraLabel"), note:tr("extraNote",{p:pct(r.uplift), x:eur(r.calls)}), tag:"est", amt:r.extra}] : [];
-
-    function row(x){ return '<tr><td>'+x.label+'<span class="tag '+x.tag+'">'+TAG[x.tag]+'</span><span class="note">'+x.note+'</span></td><td class="amt">'+eur(x.amt)+'</td></tr>'; }
     var hasB = rowsB.length>0;
     var saveParts = hasB ? "A + B + C" : "A + C";
     var totalParts = state.revOn ? saveParts+" + D" : saveParts;
     var priceTxt = state.plan==="annual"
       ? tr("priceA",{p:eur2(CFG.priceAnnual), m:eur2(CFG.priceMonthly), d:pct(Math.round((1-CFG.priceAnnual/CFG.priceMonthly)*100))})
       : tr("priceM",{p:eur2(CFG.priceMonthly)});
-    var html = '<tr class="group"><td>'+tr("gA")+'</td><td></td></tr>'+ rowsA.map(row).join("")+
-      '<tr class="sub"><td>'+tr("subtotal",{l:"A"})+'</td><td class="amt">'+eur(r.tools)+'</td></tr>';
-    if(hasB) html += '<tr class="group"><td>'+tr("gB")+'</td><td></td></tr>'+ rowsB.map(row).join("")+
-      '<tr class="sub"><td>'+tr("subtotal",{l:"B"})+'</td><td class="amt">'+eur(r.audit)+'</td></tr>';
-    html += '<tr class="group"><td>'+tr("gC")+'</td><td></td></tr>'+ rowsC.map(row).join("")+
-      '<tr class="sub"><td>'+tr("subtotal",{l:"C"})+'</td><td class="amt">'+eur(r.time)+'</td></tr>'+
-      '<tr class="sub"><td>'+tr("saveRow",{parts:saveParts})+'</td><td class="amt">'+eur(r.save)+'</td></tr>';
-    if(state.revOn) html += '<tr class="group"><td>'+tr("gD")+'</td><td></td></tr>'+ rowsD.map(row).join("")+
-      '<tr class="sub"><td>'+tr("earnRow")+'</td><td class="amt">'+eur(r.earn)+'</td></tr>';
-    html += '<tr class="sub"><td>'+tr("totalRow",{parts:totalParts})+'</td><td class="amt">'+eur(r.gross)+'</td></tr>'+
-      '<tr class="cost"><td>'+tr("costRow")+'<span class="note">'+tr("costNote",{us:usersN(r.people), price:priceTxt, mode:tr(state.plan==="annual"?"modeA":"modeM")})+'</span></td><td class="amt">'+eur(-r.cost)+'</td></tr>'+
-      '<tr class="total'+(neg?' neg':'')+'"><td>'+tr("netRow")+'<span class="note">'+tr("netNote")+'</span></td><td class="amt">'+eur(r.net)+'</td></tr>';
-    tbl.innerHTML = html;
-
+    var L = [];
+    function row(x){ return {k:"row", label:x.label, tag:TAG[x.tag], tagKey:x.tag, note:x.note, amt:eur(x.amt)}; }
+    L.push({k:"group", label:tr("gA")}); rowsA.forEach(function(x){ L.push(row(x)); }); L.push({k:"sub", label:tr("subtotal",{l:"A"}), amt:eur(r.tools)});
+    if(hasB){ L.push({k:"group", label:tr("gB")}); rowsB.forEach(function(x){ L.push(row(x)); }); L.push({k:"sub", label:tr("subtotal",{l:"B"}), amt:eur(r.audit)}); }
+    L.push({k:"group", label:tr("gC")}); rowsC.forEach(function(x){ L.push(row(x)); }); L.push({k:"sub", label:tr("subtotal",{l:"C"}), amt:eur(r.time)});
+    L.push({k:"sub", label:tr("saveRow",{parts:saveParts}), amt:eur(r.save)});
+    if(state.revOn){ L.push({k:"group", label:tr("gD")}); rowsD.forEach(function(x){ L.push(row(x)); }); L.push({k:"sub", label:tr("earnRow"), amt:eur(r.earn)}); }
+    L.push({k:"sub", label:tr("totalRow",{parts:totalParts}), amt:eur(r.gross)});
+    L.push({k:"cost", label:tr("costRow"), note:tr("costNote",{us:usersN(r.people), price:priceTxt, mode:tr(state.plan==="annual"?"modeA":"modeM")}), amt:eur(-r.cost)});
+    L.push({k:"total", neg:neg, label:tr("netRow"), note:tr("netNote"), amt:eur(r.net)});
     var all = rowsA.concat(rowsB, rowsC, rowsD);
     var sumRows = all.reduce(function(a,s){return a+s.amt;},0);
     var okTools = r.subst!==100 || r.tools===r.subM*12;
     var ok = sumRows===r.gross && r.save+r.earn===r.gross && r.tools+r.audit+r.time===r.save && r.gross-r.cost===r.net && okTools;
-    $("check").innerHTML = ok
+    var check = ok
       ? tr("chkOkHead") + (r.subst===100 ? tr("chkTools",{t:eur(r.tools), m:eur(r.subM)}) : "") + tr("chkTail",{lines:eur(sumRows), ben:eur(r.gross), cost:eur(r.cost), net:eur(r.net)})
       : tr("chkBad");
+    return {lines:L, check:check};
+  }
+
+  function renderTable(r){
+    var tbl = $("tbl");
+    if(!r.ready){
+      tbl.innerHTML = '<tr><td colspan="2" style="padding:0;border:0"><p class="empty-note">'+tr("empty")+'</p></td></tr>';
+      $("check").innerHTML=""; return;
+    }
+    var bm = breakdownModel(r), html = "";
+    bm.lines.forEach(function(x){
+      if(x.k==="group") html += '<tr class="group"><td>'+x.label+'</td><td></td></tr>';
+      else if(x.k==="row") html += '<tr><td>'+x.label+'<span class="tag '+x.tagKey+'">'+x.tag+'</span><span class="note">'+x.note+'</span></td><td class="amt">'+x.amt+'</td></tr>';
+      else if(x.k==="sub") html += '<tr class="sub"><td>'+x.label+'</td><td class="amt">'+x.amt+'</td></tr>';
+      else if(x.k==="cost") html += '<tr class="cost"><td>'+x.label+'<span class="note">'+x.note+'</span></td><td class="amt">'+x.amt+'</td></tr>';
+      else html += '<tr class="total'+(x.neg?' neg':'')+'"><td>'+x.label+'<span class="note">'+x.note+'</span></td><td class="amt">'+x.amt+'</td></tr>';
+    });
+    tbl.innerHTML = html;
+    $("check").innerHTML = bm.check;
   }
 
   var ENUM = {recCalls:["","no","some","yes"], hasConsult:["","no","yes"], optimize:["","yes","maybe","no"]};
   var SECTORS = ["","tech","services","agency","realestate","finance","health","education","industry","retail","other"];
-  function encode(){ try{ return "c="+btoa(unescape(encodeURIComponent(JSON.stringify(state)))).replace(/=+$/,""); }catch(e){ return ""; } }
-  function clampNum(v, lo, hi){ v = +v; if(!isFinite(v)) v = lo; return Math.min(hi, Math.max(lo, v)); }
-  function decode(){
-    var m = location.hash.match(/c=([A-Za-z0-9+/_-]+)/); if(!m) return false;
-    try{
-      var o = JSON.parse(decodeURIComponent(escape(atob(m[1]))));
-      if(!o || typeof o!=="object") return false;
-      var legacy = o.v===undefined;
-      Object.keys(state).forEach(function(k){ if(o[k]!==undefined && typeof o[k]===typeof state[k]) state[k]=o[k]; });
-      if(legacy){
-        if(typeof o.people==="number"){ state.reps = 0; state.rest = o.people; }
-        if(typeof o.loom==="number" || typeof o.others==="number"){ var t = Math.round(((+o.loom||0)+(+o.others||0))/12); state.apps = t; state.appsRep = t; state.appsUnknown = false; }
-        if(typeof o.uplift==="number") state.upliftSet = true;
-        if(o.step===2) state.step = 3; else if(o.step===3) state.step = 4;
-      }
-      ["reps","rest"].forEach(function(k){ state[k] = Math.round(clampNum(state[k],0,1e5)); });
-      ["team","calls","apps","appsRep"].forEach(function(k){ state[k] = Math.round(clampNum(state[k],0,1e12)); });
-      state.rec = clampNum(state.rec,0,50); state.uplift = clampNum(state.uplift,0,5); state.subst = clampNum(state.subst,0,100);
-      state.consultTier = Math.round(clampNum(state.consultTier,-1,3));
-      Object.keys(ENUM).forEach(function(k){ if(ENUM[k].indexOf(state[k])<0) state[k] = ""; });
-      if(SECTORS.indexOf(state.sector)<0) state.sector = "";
-      state.plan = state.plan==="annual" ? "annual" : "monthly";
-      state.step = Math.round(clampNum(state.step,1,LAST));
-      return true;
-    }catch(e){ return false; }
-  }
   function paintSector(){
     var o = state.sector ? $("sec-"+state.sector) : null, b = $("secBtn");
     b.classList.toggle("has", !!o);
@@ -490,23 +474,6 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
   });
 
   function msg(t, bad){ var m=$("msg"); m.textContent=t; m.style.color = bad ? "var(--warn)" : "var(--good)"; }
-  function shareLink(){ return location.origin + location.pathname + location.search + "#" + encode(); }
-  function copyLink(btnText){
-    var url = shareLink();
-    function done(){
-      msg(tr("copied"));
-      var t = $("ctaCopyText"); if(!t) return;
-      t.textContent = "Enlace copiado";
-      clearTimeout(copyTimer); copyTimer = setTimeout(function(){ t.textContent = STATIC.es.s059; }, 2600);
-      timers.push(copyTimer);
-      $("srStatus").textContent = tr("copied");
-    }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(done, function(){ window.prompt(tr("copyPrompt"), url); });
-    } else window.prompt(tr("copyPrompt"), url);
-  }
-  on($("copyBtn"), "click", copyLink);
-  on($("ctaCopy"), "click", copyLink);
   $("openCalc").addEventListener("click", function(){ openCalc(this); });
   $("mdClose").addEventListener("click", closeCalc);
   $("mdBackdrop").addEventListener("click", closeCalc);
@@ -519,13 +486,79 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
     if(e.shiftKey && (a===first || a===box || !box.contains(a))){ e.preventDefault(); last.focus(); }
     else if(!e.shiftKey && (a===last || !box.contains(a))){ e.preventDefault(); first.focus(); }
   });
-  on(window, "afterprint", function(){ document.documentElement.classList.remove("calc-printing"); document.querySelectorAll("[data-calc-keep]").forEach(function(n){ n.removeAttribute("data-calc-keep"); }); });
-  on($("pdfBtn"), "click", function(){
-    host.track("calculator_pdf", trackParams());
-    for(var n = $("calcModal").parentElement; n && n !== document.documentElement; n = n.parentElement) n.setAttribute("data-calc-keep", "");
-    document.documentElement.classList.add("calc-printing");
-    window.print();
-  });
+  // ---- PDF del cálculo: se genera en el navegador y se descarga directamente (jsPDF y las fuentes se piden al pulsar) ----
+  function plain(h){ return String(h).replace(/<[^>]+>/g,"").replace(/✓\s*/g,"").replace(/\s+/g," ").trim(); }
+  function optText(name, value){ var i = root.querySelector('input[name="'+name+'"][value="'+value+'"]'); return i && i.nextElementSibling ? i.nextElementSibling.textContent.trim() : ""; }
+  function pdfModel(){
+    var r = compute(state); if(!r.ready) return null;
+    var S = STATIC.es, bm = breakdownModel(r), yes = "Sí", no = "No";
+    var secOpt = state.sector ? $("sec-"+state.sector) : null;
+    var inputs = [
+      {label:"Sector", value: secOpt ? secOpt.querySelector("span").textContent : "—"},
+      {label:S.w024, value:group(r.reps)},
+      {label:S.w025, value:group(r.rest)},
+      {label:S.s019, value:eur(r.team)},
+      {label:S.s021, value:eur(r.calls)},
+      {label:S.w032, value: state.recCalls ? optText("recCalls", state.recCalls) : "—"},
+      {label:S.w036, value: state.hasConsult ? optText("hasConsult", state.hasConsult) : "—"}
+    ];
+    if(state.hasConsult==="yes" && state.consultTier>=0){ var tl = root.querySelector('input[name="consultTier"][value="'+state.consultTier+'"]'); inputs.push({label:S.w038, value: tl && tl.nextElementSibling ? tl.nextElementSibling.textContent.trim() : "—"}); }
+    inputs.push({label:S.w039, value: state.optimize ? optText("optimize", state.optimize) : "—"});
+    inputs.push({label:S.w043, value:eur(r.appsM) + " " + S.w044.replace("€ ","")});
+    inputs.push({label:S.w045, value: state.appsUnknown ? S.w046 : eur(r.appsRepIn) + " " + S.w044.replace("€ ","")});
+    var assumptions = [
+      {label:S.s063, value:pct(r.rec)},
+      {label:S.s064, value: state.revOn ? yes : no}
+    ];
+    if(state.revOn) assumptions.push({label:S.s066, value:pct(r.uplift)});
+    assumptions.push({label:S.s067, value:pct(Math.round(r.subst))});
+    assumptions.push({label:S.w050, value: state.audOn ? yes : no});
+    assumptions.push({label:"Facturación de Fivo", value: tr(state.plan==="annual" ? "modeA" : "modeM").replace(/^./, function(c){ return c.toUpperCase(); })});
+    var pos = r.net > 0;
+    var stats = [{label:S.r002, value:eur(r.save), sub:S.r004}];
+    if(state.revOn) stats.push({label:S.r003, value:eur(r.earn), sub:S.r004});
+    stats.push({label:"Coste de Fivo al mes", value:eur2(monthlyCost(r)), sub:eur(r.cost) + " al año"});
+    var billing = tr(state.plan==="annual" ? "billA" : "billM", {us:usersN(r.people), price:eur2(state.plan==="annual" ? CFG.priceAnnual : CFG.priceMonthly), cost:eur(r.cost)});
+    var billNote = (state.plan==="annual" || r.netIfAnnual<=0)
+      ? tr("noteA",{s:eur(r.costMonthly - r.costAnnual)})
+      : tr("noteM",{s:eur(r.costMonthly - r.costAnnual), n:eur(r.netIfAnnual)});
+    return {
+      inputs:inputs, assumptions:assumptions,
+      result:{netLabel:tr(pos ? "calcTail" : "calcTailNeg"), net:eur(r.net), netNeg:!pos, stats:stats, price:tr("priceMsg",{max:eur(Math.floor(CFG.priceMonthly)+1)}) + (state.plan==="annual" ? "" : " " + plain(tr("noteM",{s:eur(r.costMonthly - r.costAnnual), n:eur(r.netIfAnnual)})))},
+      lines:bm.lines.map(function(x){ return {k:x.k, label:x.label, note:x.note, tag:x.tag, amt:x.amt, neg:x.neg}; }),
+      how:{intro:S.s072, check:plain(bm.check), billing:S.s042 + ": " + billing, billingNote:plain(billNote), estimate:S.e001},
+      disclaimer:host.disclaimer, callWhen:host.callWhen()
+    };
+  }
+  var pdfBusy = false, pdfTimer = null;
+  function pdfBtns(){ return [$("ctaPdf"), $("pdfBtn")].filter(Boolean); }
+  function pdfLabel(btn, text){ var s = btn.querySelector("span"); (s || btn).textContent = text; }
+  function pdfIdle(){ pdfBtns().forEach(function(b){ pdfLabel(b, b.id==="ctaPdf" ? "Descargar mi cálculo en PDF" : STATIC.es.s060); }); }
+  function downloadPdf(){
+    if(pdfBusy) return;
+    var model = pdfModel();
+    if(!model){ msg(tr("needData"), true); return; }
+    pdfBusy = true; clearTimeout(pdfTimer);
+    pdfBtns().forEach(function(b){ b.disabled = true; b.setAttribute("aria-busy", "true"); pdfLabel(b, tr("pdfPreparing")); });
+    $("srStatus").textContent = tr("pdfPreparing");
+    import("./pdf").then(function(mod){
+      return mod.buildCalculatorPdf(model).then(function(blob){ mod.saveBlob(blob, "calculo-fivo.pdf"); });
+    }).then(function(){
+      host.track("calculator_pdf", trackParams());
+      pdfBtns().forEach(function(b){ pdfLabel(b, tr("pdfDone")); });
+      $("srStatus").textContent = tr("pdfDone");
+      pdfTimer = setTimeout(pdfIdle, 3500); timers.push(pdfTimer);
+    }).catch(function(){
+      pdfBtns().forEach(function(b){ pdfLabel(b, tr("pdfFail")); });
+      msg(tr("pdfFail"), true);
+      pdfTimer = setTimeout(pdfIdle, 4500); timers.push(pdfTimer);
+    }).then(function(){
+      pdfBusy = false;
+      pdfBtns().forEach(function(b){ b.disabled = false; b.removeAttribute("aria-busy"); });
+    });
+  }
+  on($("ctaPdf"), "click", downloadPdf);
+  on($("pdfBtn"), "click", downloadPdf);
   root.querySelectorAll(".sq").forEach(function(b){
     b.addEventListener("click", function(){
       var inp = $(b.dataset.for), v = Math.max(0, Math.min(99999, parse(inp.value) + parseInt(b.dataset.step, 10)));
@@ -540,13 +573,13 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
     var r = compute(state);
     if(!r.ready){ msg(tr("needData"), true); return; }
     var payload = { email:email, lang:LANG, hp:$("hp").value, source:host.source, inputs:state, results:{
-      tools:r.tools, audit:r.audit, value:r.value, benefits:r.gross, cost:r.cost, net:r.net }, link:shareLink() };
+      tools:r.tools, audit:r.audit, value:r.value, benefits:r.gross, cost:r.cost, net:r.net } };
     if(CFG.leadEndpoint){
       fetch(CFG.leadEndpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
         .then(function(res){ if(!res.ok) throw 0; msg(tr("sent",{email:email})); host.track("calculator_report_sent", trackParams()); })
         .catch(function(){ msg(tr("sendFail"), true); });
     } else {
-      window.open(CFG.contactUrl+"?email="+encodeURIComponent(email)+"&lang="+LANG+"#"+encode(), "_blank", "noopener");
+      window.open(CFG.contactUrl+"?email="+encodeURIComponent(email)+"&lang="+LANG, "_blank", "noopener");
       msg(tr("goContact"));
     }
   });
@@ -623,14 +656,11 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
   on(root, "input", markStart);
   on(root, "change", markStart);
   on(root, "click", function(e){ if(e.target.closest && e.target.closest("button,label,li")) markStart(); });
-  var fromLink = decode();
-  if(fromLink){ try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){} timers.push(setTimeout(function(){ root.scrollIntoView({block:"start"}); }, 60)); }
   LANG = "es"; state.lang = "es";
   applyStatic();
   syncControls();
   buildExamples();
-  if(fromLink && state.step===LAST && compute(state).ready){ calcDone = true; $("netCard").classList.add("ok"); renderSteps(); render(); }
-  else { if(state.step===LAST || (state.step>1 && !canNext1(compute(state)))) state.step = 1; renderSteps(); render(); announce(); }
+  renderSteps(); render(); announce();
 
   return function destroy() {
     off.forEach(function (f) { f(); });

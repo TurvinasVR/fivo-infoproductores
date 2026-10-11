@@ -403,31 +403,9 @@ html.md-open {overflow:hidden}
 .calc ol, .calc ul { margin: 0; }
 .calc .cbtn-ghost { border-radius: var(--radius-field); }
 
-/* "Descargar PDF" imprime solo el desglose: el motor marca el camino hasta el modal con data-calc-keep y el resto se oculta.
-   Papel blanco: se redefinen los tokens de color solo en el modo de impresión. */
 .calc .btn-cta svg { width: 16px; height: 16px; flex: none; }
 .calc .rs-after { margin: 20px 0 0; text-align: center; font-size: 15px; color: var(--color-fg-muted); }
 
-@media print {
-  html.calc-printing {
-    --color-bg: #fff; --color-surface: #fff; --color-surface-2: #f6f8fc; --color-fg: #0c1a33; --color-fg-muted: #4a5568;
-    --color-fg-subtle: #5b6b86; --color-line: #d8dde6; --color-line-strong: #c4cad6; --color-accent: #12336e; --color-accent-soft: #e9efff;
-    --color-grad-a: #12336e; --color-grad-b: #12336e;
-    background: #fff;
-  }
-  html.calc-printing body { background: #fff; }
-  html.calc-printing [data-calc-keep] {
-    position: static !important; display: block !important; margin: 0 !important; padding: 0 !important; border: 0 !important;
-    max-width: none !important; width: auto !important; height: auto !important; min-height: 0 !important; overflow: visible !important;
-    transform: none !important; background: none !important;
-  }
-  html.calc-printing [data-calc-keep] > :not([data-calc-keep]):not(.modal) { display: none !important; }
-  html.calc-printing .calc .modal { position: static !important; display: block !important; padding: 0; background: none; }
-  html.calc-printing .calc .modal-box { position: static; width: auto; max-height: none; display: block; box-shadow: none; border: 0; background: none; }
-  html.calc-printing .calc .modal-backdrop, html.calc-printing .calc .md-x, html.calc-printing .calc .rs-assume, html.calc-printing .calc .rs-share { display: none !important; }
-  html.calc-printing .calc .md-body { overflow: visible; }
-  html.calc-printing .calc .tbl tr.group td { color: var(--color-accent); background: var(--color-accent-soft); }
-  html.calc-printing .calc .tbl tr.sub td { background: var(--color-surface-2); }
-  html.calc-printing .calc .tbl tr.total td { color: #fff; background: var(--color-accent); }
-  html.calc-printing .calc .cseg button[aria-pressed="true"] { color: #fff; }
+@media (max-width: 699px) {
+  .calc .btn-main { padding: 0 1rem; font-size: 1rem; }
 }

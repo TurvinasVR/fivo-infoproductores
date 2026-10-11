@@ -66,7 +66,7 @@ export function ThanksContent({ content }: { content: LandingContent }) {
         </div>
       )}
 
-      <CalculatorSection title={thanks.calculator.title} intro={thanks.calculator.intro} resultTitle={thanks.calculator.resultTitle} />
+      <CalculatorSection title={thanks.calculator.title} intro={thanks.calculator.intro} resultTitle={thanks.calculator.resultTitle} disclaimer={content.footer.disclaimer ?? ""} />
     </main>
   );
 }

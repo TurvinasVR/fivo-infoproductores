@@ -14,7 +14,7 @@ const sub = "mt-2 text-[15px] text-fg-muted sm:text-base";
  * Titular + calculadora + opiniones. En los pasos 1 a 3 el titular invita a calcular; en el resultado dice "Este es tu
  * cálculo". Los dos textos comparten celda de la rejilla: el alto lo marca el mayor y el cambio no mueve la página.
  */
-export function CalculatorSection({ title, intro, resultTitle }: { title: string; intro: string; resultTitle: string }) {
+export function CalculatorSection({ title, intro, resultTitle, disclaimer }: { title: string; intro: string; resultTitle: string; disclaimer: string }) {
   const section = useRef<HTMLElement>(null);
   const [step, setStep] = useState(1);
 
@@ -43,7 +43,7 @@ export function CalculatorSection({ title, intro, resultTitle }: { title: string
         </div>
       </div>
       <div className="mt-5 lg:mt-6">
-        <Calculator />
+        <Calculator disclaimer={disclaimer} />
       </div>
       {result && <Reviews />}
     </section>

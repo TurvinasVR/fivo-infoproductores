@@ -17,7 +17,6 @@ export const STATIC_ES: Record<string, string> = {
   "s044": "Anual",
   "s045": "AHORRA 25%",
   "s058": "Enviarme mi informe",
-  "s059": "Copiar enlace con mi cálculo",
   "s060": "Descargar PDF",
   "s061": "Pon a prueba los supuestos",
   "s062": "Parten de valores razonables. Bájalos o desactiva los suplementos y comprueba cuánto sigue saliendo.",
