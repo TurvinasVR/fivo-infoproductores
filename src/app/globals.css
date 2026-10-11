@@ -556,3 +556,7 @@ html[data-hero3d] .hero-graph-svg {
 video::-webkit-media-text-track-container {
   display: none !important;
 }
+
+/* /gracias: el botón del calendario solo existe si hay fecha (la marca el script de ThanksPage antes de pintar) */
+.cal-slot { display: none; }
+html[data-booking] .cal-slot { display: inline-block; }

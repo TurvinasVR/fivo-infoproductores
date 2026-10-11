@@ -6,8 +6,8 @@
   --brand: var(--color-accent);
   --b1: var(--color-grad-a);
   --b2: var(--color-grad-b);
-  /* Un solo degradado de marca por pantalla: el botón principal (.btn-cta). El resto de rellenos van en acento liso. */
-  --grad: linear-gradient(var(--color-accent), var(--color-accent));
+    --grad: linear-gradient(90deg, var(--color-grad-a), var(--color-grad-b));
+  --grad-135: linear-gradient(135deg, var(--color-grad-a), var(--color-grad-b));
   --track: color-mix(in srgb, var(--color-fg) 12%, transparent);
   --card: var(--color-surface);
   --line: var(--color-line);
@@ -68,16 +68,16 @@
 .calc .stp.on .stp-btn {color:var(--color-fg)}
 .calc .stp.done .stp-btn {color:color-mix(in srgb, var(--color-fg) 92%, transparent)}
 .calc .stp-btn:not(:disabled):not([aria-current]):hover b {border-color:var(--color-fg)}
-.calc .stp b {position:relative;isolation:isolate;width:30px;height:30px;border-radius:50%;background:transparent;border:1.5px solid color-mix(in srgb, var(--color-fg) 55%, transparent);display:grid;place-items:center;font-size:13px;font-weight:600;color:color-mix(in srgb, var(--color-fg) 92%, transparent);font-style:normal}
-.calc .stp b::before {content:"";position:absolute;inset:-1.5px;border-radius:50%;background:var(--grad);opacity:0;z-index:-1;transition:opacity .25s ease-out}
+.calc .stp b {position:relative;isolation:isolate;width:30px;height:30px;border-radius:50%;background:transparent;border:1.5px solid var(--color-line-strong);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--color-fg-muted);font-style:normal}
+.calc .stp b::before {content:"";position:absolute;inset:-1.5px;border-radius:50%;background:var(--grad-135);opacity:0;z-index:-1;transition:opacity .25s ease-out}
 .calc .stp b .n, .calc .stp b .ck {grid-area:1/1;font-style:normal}
 .calc .stp b .ck {width:16px;height:16px;opacity:0;transform:scale(.4)}
-.calc .stp.on b {background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg)}
+.calc .stp.on b {background:linear-gradient(var(--color-bg),var(--color-bg)) padding-box, var(--grad-135) border-box;border-color:transparent;color:var(--color-fg)}
 .calc .stp.done b {border-color:transparent;color:var(--color-fg)}
 .calc .stp.done b::before {opacity:1}
 .calc .stp.done b .n {opacity:0;transform:scale(.6);transition:opacity .15s,transform .2s}
 .calc .stp.done b .ck {opacity:1;transform:scale(1);transition:opacity .2s .1s,transform .35s cubic-bezier(.16,1,.3,1) .1s}
-.calc .stp-line {flex:none;width:38px;height:2px;margin-right:8px;border-radius:2px;background:color-mix(in srgb, var(--color-fg) 28%, transparent);overflow:hidden}
+.calc .stp-line {flex:none;width:38px;height:2px;margin-right:8px;border-radius:2px;background:var(--color-line);overflow:hidden}
 .calc .stp-line i {display:block;height:100%;background:var(--grad);transform:scaleX(0);transform-origin:left center;transition:transform .4s cubic-bezier(.16,1,.3,1)}
 .calc .stp.on .stp-line i, .calc .stp.done .stp-line i {transform:scaleX(1)}
 @keyframes calc-stpPop {0%{transform:scale(.82)}55%{transform:scale(1.12)}100%{transform:scale(1)}}
@@ -408,8 +408,6 @@ html.md-open {overflow:hidden}
 /* Titulares y cifras grandes en Satoshi; el resto de la interfaz, en Manrope */
 .calc .q-title, .calc .rs-title, .calc .cta h4, .calc .md-head h2, .calc .vid-sec h3, .calc .ex h3, .calc .ex-card h4,
 .calc .net-n, .calc .live-n, .calc .stat .big, .calc .rs-assume h3 { font-family: var(--font-head); }
-.calc .net-n { background: none; color: var(--color-accent); -webkit-text-fill-color: currentColor; }
-.calc .net.neg .net-n { color: var(--warn); }
 .calc .wrap { padding-inline: 0; }
 .calc :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 .calc ::selection { background: var(--color-accent-soft); color: var(--color-fg); }

@@ -17,7 +17,8 @@ import { useLanding } from "../landing/LandingContext";
 
 type Stage = "form" | "calendar" | "free";
 
-export const BOOKING_KEY = "fivo-booking";
+import { BOOKING_KEY } from "@/lib/booking";
+export { BOOKING_KEY };
 
 function Steps({ stage }: { stage: Stage }) {
   const second = stage === "calendar";

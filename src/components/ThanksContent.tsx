@@ -1,15 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { CalendarPlus, CheckCircle } from "@phosphor-icons/react";
+import { useLayoutEffect, useState } from "react";
+import { CheckCircle } from "@phosphor-icons/react";
 import { siteConfig } from "@/config/site";
 import type { LandingContent } from "@/content/types";
-import { BOOKING_KEY } from "./booking/BookingBlock";
+import { readBooking, type BookingInfo } from "@/lib/booking";
+import { CalendarAdd } from "./CalendarAdd";
 import { VideoPlayer } from "./VideoPlayer";
 import { TestimonialCard } from "./Testimonial";
-import { Calculator } from "./calculator/Calculator";
-
-type Booking = { startsAt: string | null; minutes: number; mock: boolean };
+import { CalculatorSection } from "./calculator/CalculatorSection";
 
 const whenFmt = new Intl.DateTimeFormat("es-ES", {
   weekday: "long",
@@ -19,51 +18,21 @@ const whenFmt = new Intl.DateTimeFormat("es-ES", {
   minute: "2-digit",
 });
 
-function toIcsDate(d: Date) {
-  return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-}
-
-function downloadIcs(b: Booking, prodid: string) {
-  if (!b.startsAt) return;
-  const start = new Date(b.startsAt);
-  const end = new Date(start.getTime() + b.minutes * 60_000);
-  const ics = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    `PRODID:${prodid}`,
-    "BEGIN:VEVENT",
-    `UID:${toIcsDate(start)}-fivo-llamada@fivo.ai`,
-    `DTSTAMP:${toIcsDate(new Date())}`,
-    `DTSTART:${toIcsDate(start)}`,
-    `DTEND:${toIcsDate(end)}`,
-    "SUMMARY:Llamada de 30 minutos con Fivo",
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\r\n");
-  const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" }));
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "llamada-fivo.ics";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
 export function ThanksContent({ content }: { content: LandingContent }) {
   const { slug, thanks, proof } = content;
   const rt = siteConfig.landings[slug];
-  const [booking, setBooking] = useState<Booking | null>(null);
+  const [booking, setBooking] = useState<BookingInfo | null>(null);
 
-  useEffect(() => {
-    try {
-      const raw = window.sessionStorage.getItem(BOOKING_KEY);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (raw) setBooking(JSON.parse(raw) as Booking);
-    } catch {
-      /* sin datos: confirmación genérica */
-    }
+  // Antes de pintar (también al llegar por navegación interna, donde el script de ThanksPage no corre): fecha de la
+  // llamada, de los parámetros de la URL del proveedor de calendario o de la reserva guardada en el navegador
+  useLayoutEffect(() => {
+    const b = readBooking();
+    document.documentElement.toggleAttribute("data-booking", Boolean(b));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setBooking(b);
   }, []);
 
-  const when = booking?.startsAt ? whenFmt.format(new Date(booking.startsAt)) : null;
+  const when = booking ? whenFmt.format(booking.startsAt) : null;
   const videoReady = rt.ready.thanksVideo && rt.thanksVideo.src;
   const showVideo = Boolean(videoReady);
   const showTestimonials = rt.ready.testimonials && proof.testimonials.length >= 3;
@@ -90,15 +59,7 @@ export function ThanksContent({ content }: { content: LandingContent }) {
           <p className="mt-2 text-sm text-warn">Reserva de ejemplo: el calendario de la página anterior era simulado.</p>
         )}
 
-        <button
-          type="button"
-          className="btn-ghost mt-4 disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={!booking?.startsAt}
-          onClick={() => booking && downloadIcs(booking, thanks.ics.prodid)}
-        >
-          <CalendarPlus size={18} aria-hidden />
-          Añadir al calendario
-        </button>
+        <CalendarAdd booking={booking} prodid={thanks.ics.prodid} />
       </div>
 
       {showVideo && (
@@ -119,20 +80,7 @@ export function ThanksContent({ content }: { content: LandingContent }) {
         </div>
       )}
 
-      <section aria-labelledby="calculadora" className="mt-8 lg:mt-12">
-        <div className="mx-auto max-w-[760px] text-center">
-          <h2
-            id="calculadora"
-            className="font-display text-[clamp(1.375rem,1rem+1.6vw,2rem)] font-black leading-[1.15] tracking-[-0.015em]"
-          >
-            {thanks.calculator.title}
-          </h2>
-          <p className="mt-2 text-[15px] text-fg-muted sm:text-base">{thanks.calculator.intro}</p>
-        </div>
-        <div className="mt-5 lg:mt-6">
-          <Calculator />
-        </div>
-      </section>
+      <CalculatorSection title={thanks.calculator.title} intro={thanks.calculator.intro} resultTitle={thanks.calculator.resultTitle} />
     </main>
   );
 }

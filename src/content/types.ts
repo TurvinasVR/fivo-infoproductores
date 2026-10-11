@@ -186,6 +186,6 @@ export type LandingContent = {
     videoLabel: string;
     ics: { prodid: string };
     /** Calculadora de ahorro de /gracias. */
-    calculator: { title: string; intro: string };
+    calculator: { title: string; intro: string; resultTitle: string };
   };
 };

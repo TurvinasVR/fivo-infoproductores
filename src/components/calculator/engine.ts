@@ -239,6 +239,7 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
     if(res) ensureBand();
     $("logoBand").hidden = !(res && bandOK);
     root.classList.toggle("is-result", res);
+    root.dispatchEvent(new CustomEvent("calc:step", {detail:{step:state.step}, bubbles:true}));
     $("live").hidden = res;
   }
   function goto(n){
@@ -246,7 +247,7 @@ export function initCalculator(root: HTMLElement, host: CalculatorHost): () => v
     if(first) calcDone = true;
     state.step = n; root.classList.add("anim"); renderSteps(); render();
     if(first){ revealResult(); host.track("calculator_complete", trackParams()); } else if(n!==LAST) announce();
-    var f = $("calc"); if(f && f.scrollIntoView) f.scrollIntoView({behavior: reduced?"auto":"smooth", block:"start"});
+    var f = root.closest("[data-calc-section]") || $("calc"); if(f && f.scrollIntoView) f.scrollIntoView({behavior: reduced?"auto":"smooth", block:"start"});
   }
 
   var tierSig = "";
