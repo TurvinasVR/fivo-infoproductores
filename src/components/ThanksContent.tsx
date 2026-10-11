@@ -7,6 +7,7 @@ import type { LandingContent } from "@/content/types";
 import { BOOKING_KEY } from "./booking/BookingBlock";
 import { VideoPlayer } from "./VideoPlayer";
 import { TestimonialCard } from "./Testimonial";
+import { Calculator } from "./calculator/Calculator";
 
 type Booking = { startsAt: string | null; minutes: number; mock: boolean };
 
@@ -143,6 +144,18 @@ export function ThanksContent({ content }: { content: LandingContent }) {
           <TestimonialCard data={proof.testimonials[2]} />
         </div>
       )}
+
+      <section aria-labelledby="calculadora" className="mt-16 lg:mt-28">
+        <h2
+          id="calculadora"
+          className="mx-auto max-w-[760px] text-center font-display text-[clamp(1.6rem,1.1rem+1.8vw,2.5rem)] font-black leading-[1.1] tracking-[-0.015em]"
+        >
+          {thanks.calculator.title}
+        </h2>
+        <div className="mt-8 lg:mt-10">
+          <Calculator />
+        </div>
+      </section>
     </main>
   );
 }
