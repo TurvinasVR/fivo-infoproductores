@@ -91,12 +91,9 @@ export type LandingContent = {
     trust: string;
   };
 
+  /** Herramientas que se conectan al grafo de "Cómo funciona". */
   tools: {
     ids: ToolId[];
-    title: string;
-    intro?: string;
-    srList: string;
-    after?: { main: string; small: string };
   };
 
   problem: {

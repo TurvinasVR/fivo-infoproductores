@@ -105,7 +105,6 @@ export async function buildCalculatorPdf(m: PdfModel): Promise<Blob> {
     doc.setFont(family, style);
     doc.setFontSize(size);
   };
-  const body = () => { font("Manrope", "normal", 9.5); color(INK); };
   const lh = (size: number) => size * 0.3528 * 1.38; // alto de línea en mm
 
   // Línea fina con el degradado de marca (tramos de color: sin dependencias de degradados del PDF)

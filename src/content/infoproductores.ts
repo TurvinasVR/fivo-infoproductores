@@ -13,7 +13,6 @@ export const infoproductores: LandingContent = {
   thanksPath: "/infoproductores/gracias",
   repeatCta: true,
   ctaLines: {
-    herramientas: "¿Ya usas estas herramientas? Te enseñamos cómo quedaría todo conectado.",
     problema: "Así se ve con Fivo. En la llamada lo vemos con tu negocio.",
     "como-funciona": "Te lo enseñamos con un negocio como el tuyo en **30 minutos**.",
     pregunta: "¿Qué le preguntarías tú a tu negocio? Tráelo a la llamada y lo vemos.",
@@ -33,12 +32,6 @@ export const infoproductores: LandingContent = {
 
   tools: {
     ids: ["zoom", "meet", "outlook", "gmail", "drive", "clickup", "trello", "jira", "chatgpt", "claude"],
-    title: "Se conecta a lo que ya usas, y a tu IA",
-    srList: "Zoom, Google Meet, Microsoft Outlook, Gmail, Google Drive, ClickUp, Trello y Jira, y ChatGPT y Claude vía MCP.",
-    after: {
-      main: "Seis herramientas separadas no son un sistema. Fivo las une sin que cambies ninguna.",
-      small: "¿Usas algo que no está aquí? Los webhooks conectan el resto.",
-    },
   },
 
   problem: {

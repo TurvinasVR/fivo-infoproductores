@@ -15,7 +15,6 @@ export type CtaPosition =
   | "video_end"
   | "fijo-movil"
   | "gracias"
-  | "herramientas"
   | "problema"
   | "como-funciona"
   | "pregunta"
